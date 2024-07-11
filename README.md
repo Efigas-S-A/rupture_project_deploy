@@ -35,7 +35,7 @@ Una vez instalado git en el sistema operativo correspondiente, desde una consola
    ```bash
       git config --global user.name "Tu Nombre"
       git config --global user.email "tu_correo@ejemplo.com"
-
+   ```
 Clonar el repositorio del proyecto (DESDE CONSOLA)
 definida las credenciales ya podemos clonar este proyecto en una carpeta dentro de nuestra pc, para esto dentro de una consola de comando y ubicandonos en la ruta de la carpeta donde queremos ubicar el proyecto ejecutar el siguiente comando
    
