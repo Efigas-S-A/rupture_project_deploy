@@ -1,0 +1,6 @@
+openpyxl
+flask
+flask_mail
+requests
+pandas
+pyDes
