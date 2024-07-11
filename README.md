@@ -104,13 +104,13 @@ Para crear las variables de entorno varia despendiendo del sistema operativo
 
 Las variables a crear son:
 
-- MAIL_SERVER => Corresponde a el servidor SMTP de preferencia asociado al servidor del correo es decir si es gmail o outlook etc por ejemplo si es gmail el valor seria smtp.gmail.com
-- MAIL_PORT => el puerto del servidor SMTP que se requiere y por el cual se envian los correos.  por ejemplo para gmail seria el puerto 587
-- MAIL_USERNAME => seria el correo desde el cual se van a enviar los mails de creación de usuario, recuperación de cuentas y demas y que esta asociado al MAIL_SERVER seleccionado-
-- MAIL_PASSWORD => hace referencia a la contraseña de aplicación creada para el correo seleccionado, este se debe crear desde gmail o microsoft dependiendo del tipo de correo seleccionado no corresponde a la contraseña del correo como tal, se debe crear una contraseña de aplicación.
-- MAIL_DEFAULT_SENDER => corresponde al mismo MAIL_USERNAME
-- KEY_APP => corresponde a la llave unica que identifica el inicio de sesión de la aplicación debe ser de tipo LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b''
-- ENCRIPT_KEY => LLAVE QUE REPRESENTA EL TIPO DE ENCRIPTACIÓN QUE SE LE REALIZARA A LAS CONTRASEÑAS E INFORMACIÓN DEL USUARIO TIENE QUE SER EN EL FORMATO HEXADECIMAL PARA LUEGO SER PASADA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA LLAVE SE USA CON LA LIBRERIA pyDes de python que permite realizar encriptaciones, para codificar mi llabe de cadena de bytes a hexadecimal usar el codigo de python:
+- MAIL_SERVER : Corresponde a el servidor SMTP de preferencia asociado al servidor del correo es decir si es gmail o outlook etc por ejemplo si es gmail el valor seria smtp.gmail.com
+- MAIL_PORT : el puerto del servidor SMTP que se requiere y por el cual se envian los correos.  por ejemplo para gmail seria el puerto 587
+- MAIL_USERNAME : seria el correo desde el cual se van a enviar los mails de creación de usuario, recuperación de cuentas y demas y que esta asociado al MAIL_SERVER seleccionado-
+- MAIL_PASSWORD : hace referencia a la contraseña de aplicación creada para el correo seleccionado, este se debe crear desde gmail o microsoft dependiendo del tipo de correo seleccionado no corresponde a la contraseña del correo como tal, se debe crear una contraseña de aplicación.
+- MAIL_DEFAULT_SENDER : corresponde al mismo MAIL_USERNAME
+- KEY_APP : corresponde a la llave unica que identifica el inicio de sesión de la aplicación debe ser de tipo LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b''
+- ENCRIPT_KEY : LLAVE QUE REPRESENTA EL TIPO DE ENCRIPTACIÓN QUE SE LE REALIZARA A LAS CONTRASEÑAS E INFORMACIÓN DEL USUARIO TIENE QUE SER EN EL FORMATO HEXADECIMAL PARA LUEGO SER PASADA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA LLAVE SE USA CON LA LIBRERIA pyDes de python que permite realizar encriptaciones, para codificar mi llabe de cadena de bytes a hexadecimal usar el codigo de python:
 
 ```bash
       hex_key = secret_key.hex() ## DONDE secret_key es una cadena de bytes en b''
