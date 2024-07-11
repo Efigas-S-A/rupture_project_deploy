@@ -4,12 +4,12 @@ Este repositorio contiene un proyecto desarrollado específicamente para empresa
 
 ## Tabla de Contenidos
 
-1. [descarga del proyecto]
-2. [Creación del entorno virtual]
-3. [Instalación de dependencias]
-4. [Creación de variables de entorno]
-5. [Recomendaciones]
-6. [Copia del repositorio para su uso propio]
+1. descarga del proyecto
+2. Creación del entorno virtual
+3. Instalación de dependencias
+4. Creación de variables de entorno
+5. Recomendaciones
+6. Copia del repositorio para su uso propio
 
 ## Descarga del proyecto
 
@@ -24,19 +24,17 @@ Para obtener una copia del proyecto y empezar su proceso de despliegue es necesa
 * macOS (desde consola)
   1) Instalar git usando Homebrew:
     ```bash
-    brew install git
+       brew install git
 * Linux (desde consola)
    ```bash
-    sudo apt update
-   ```bash
-    sudo apt install git
+      sudo apt update
+      sudo apt install git
 
 Una vez instalado git en el sistema operativo correspondiente, desde una consola de comando y configurar las credenciales de git asociadas a la cuenta de git de la siguiente manera:
 
    ```bash
-    git config --global user.name "Tu Nombre"
-   ```bash
-    git config --global user.email "tu_correo@ejemplo.com"
+      git config --global user.name "Tu Nombre"
+      git config --global user.email "tu_correo@ejemplo.com"
 
 #  Clonar el repositorio del proyecto (DESDE CONSOLA)
 definida las credenciales ya podemos clonar este proyecto en una carpeta dentro de nuestra pc, para esto dentro de una consola de comando y ubicandonos en la ruta de la carpeta donde queremos ubicar el proyecto ejecutar el siguiente comando
