@@ -126,11 +126,11 @@ http://localhost:5000 => dominio respectivo. ejemplo https://ruptures.projecthub
 
 El proyecto suministrado es un proyecto que sirve como demo para demostrar el funcionamiento base de la aplicación, pero no esta desarrollado en su totalidad para un despliegue un puesta en producción, en caso tal de que se desee realizar algo parecido, es necesario tener presente lo siguiente:
 
- - El sistema no cuenta con una base de datos para su despliegue, en esta se esta simulando dicha conexión mediante el uso de 3 archivos excel, que son usuarios.xlsx,solicitudes.xlsx y la carpeta eventos donde se registran los sucesos registrados en la plataforma, por ende a la hora de pensar en un despliegue producto sera necesario cambiar la funcionalidad de la aplicación a una conexión a una base de datos que se estipule ya sea de tipo SQL o No SQL como mongo.
+ - El sistema no cuenta con una base de datos para su despliegue, en esta se esta simulando dicha conexión mediante el uso de 3 archivos excel, que son usuarios.xlsx , solicitudes.xlsx y la carpeta eventos donde se registran los sucesos registrados en la plataforma, por ende a la hora de pensar en un despliegue producto sera necesario cambiar la funcionalidad de la aplicación a una conexión a una base de datos que se estipule ya sea de tipo SQL o No SQL como mongo.
 -  Las variables de acceso a la base de datos nueva, para un despliegue deben quedar tambien referidas mediante variables de entorno para evitar fallas de seguridad a la hora del despliegue.
 -  El correo asociado a los mensajes debe ser un correo que haga parte del directorio activo de la institución que lo vaya a utilizar, para evitar fallas por bloqueos de spam y demas situaciones que se pueden presentar debido a la diferencia entre el dominio del correo y los correos de la empresa.
 
-- En caso de querer generar un repo nuevo en base al proyecto realizado generar un fork desde github.
+- En caso de querer generar un repositorio nuevo en base al proyecto realizado generar un fork desde github.
 
 
 
