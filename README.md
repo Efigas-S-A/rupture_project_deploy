@@ -1,6 +1,6 @@
 # rupture_project
 
-Este repositorio contiene un proyecto desarrollado específicamente para empresas del sector gasero interesadas en estudiar y analizar fallas en tuberías. El objetivo principal es proporcionar herramientas y análisis que permitan mejorar la gestión y mantenimiento de las infraestructuras de tuberías utilizadas en la industria del gas.
+Este repositorio contiene un proyecto desarrollado específicamente para empresas del sector gasero interesadas en estudiar y analizar roturas en tuberias causadas por terceros. El objetivo principal es proporcionar herramientas y análisis que permitan mejorar la gestión y mantenimiento de las infraestructuras de tuberías utilizadas en la industria del gas, y los volumenes de gas emitidos por las roturas.
 
 ## Tabla de Contenidos
 
