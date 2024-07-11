@@ -41,7 +41,7 @@ definida las credenciales ya podemos clonar este proyecto en una carpeta dentro 
    
    ```bash
       git clone https://github.com/Efigas-S-A/rupture_project.git
-
+    ```
 Esto clonara una carpeta con el proyecto, con lo cual con el comando "cd rupture_project" , podemos dirigirnos a la carpeta del proyecto donde encontraremos todos los elementos para ejecutar la aplicación, la cual podemos abrir en un IDE de codigo como visual studio code mediante el comando "code ./" en caso tal de que ya lo tengamos instalado.
 
 
@@ -49,17 +49,17 @@ Esto clonara una carpeta con el proyecto, con lo cual con el comando "cd rupture
 ubicados en la carpeta clonada rupture_project/, y con python instalado en el pc, realizamos la creación del entorno virtual de trabajo, mediante el siguiente comando en consola
   ```bash
         python -m venv venv
-
+   ```
 esto creara una carpeta venv en el proyecto, y como siguiente paso activamos el entorno, lo cual puede variar dependiendo del sistema operativo utilizado
 
  * Windows
    ```bash
         .\venv\Scripts\activate
-
+    ```
 * Linux / mac OS
     ```bash
         source ./venv/bin/activate
-
+     ```
 a lo cual debe aparecer en consola al inicio de la ruta actual  las siglas "(venv)" que indicaran que el entorno se encuentra activado.
 
 ## Instalación de dependencias
@@ -67,13 +67,16 @@ a lo cual debe aparecer en consola al inicio de la ruta actual  las siglas "(ven
   * Windows
     ```bash
         python.exe -m pip install --upgrade pip
+     ```
   * Linux
     ```bash
-        pip install --upgrade pip 
+        pip install --upgrade pip
+     ```
 
   Una vez actualizado instalamos las dependencias con el archivo requirements.txt que esta presente en el proyecto desde la consola de la siguiente manera
     ```bash
         pip install -r requirements.txt
+     ```
 
   Con esto tenemos todos los paquetes de python necesarios para ejecutar nuestra aplicación, solo falta un paso para completar todos los requerimientos necesarios y es crear las variables de entorno que nuestra aplicación necesita para poder ejecutar los procesos que realiza.
 
@@ -85,7 +88,7 @@ Para crear las variables de entorno varia despendiendo del sistema operativo
  1) Abre una powershell de windows y ejecuta el siguiente comando para crear las variables de entorno
     ```bash
           setx NOMBRE_VARIABLE "Valor_variable"
-
+     ```
  * Linux
 
     1)  Abre una terminal.
@@ -94,6 +97,7 @@ Para crear las variables de entorno varia despendiendo del sistema operativo
     
        ```bash
        nano ~/.bashrc
+        ```
     3) Dentro del archivo bashrc ubica la variable de la siguiente manera:
 
        export MI_VARIABLE="valor_de_mi_variable"
@@ -111,7 +115,7 @@ Las variables a crear son:
 ```bash
       hex_key = secret_key.hex() ## DONDE secret_key es una cadena de bytes en b''
 
-
+ ```
 Para verificar donde se usan dichas variables, mirar el archivo rl.py lineas 18 a la 27
 
 FINALMENTE EN CASO DE QUE LA APLICACIÓN ESTE SIENDO DESPLEGADA CON UN DOMINIO DETERMINADO SERA NECESARIO EDITAR TODAS LAS PORCIONES DE CODIGO DONDE SE TIENE
