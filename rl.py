@@ -242,7 +242,7 @@ def guardar_usuario():
     response = requests.post(url,json=object_)
 
     if(response.json()['status'] == 'Usuario creado con éxito'):
-        flash('Usuario creado con éxito', 'success')
+        # flash('Usuario creado con éxito', 'success')
         return redirect(url_for('salir'))
     else:
         ### MOSTRAMOS UNA ALERTA INDICANDO EL PROBLEMA

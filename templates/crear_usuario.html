@@ -42,15 +42,7 @@
 
   <body style="background-image: url('{{ url_for('static', filename='images/Fondo.png') }}')">
     <!-- Mensajes Flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    
     <div class="evento-header">
       <div class="evento-app-container">
         <img
