@@ -4,7 +4,7 @@ import random
 import string
 from openpyxl import load_workbook, Workbook
 from functools import wraps
-from flask import Flask, request, send_file, render_template, make_response, redirect, session
+from flask import Flask, request, send_file, render_template, make_response, redirect, session,flash,url_for
 from flask_mail import Mail, Message
 import requests
 import pandas as pd
@@ -15,18 +15,17 @@ import shutil
 
 dominio = "http://localhost:5000" # CAMBIAR AL DOMINIO DE DESPLIEGUE
 app = Flask(__name__)
-app.secret_key = bytes.fromhex(os.getenv('KEY_APP')) ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b''
-key = bytes.fromhex(os.getenv('ENCRIPT_KEY')) ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA SERA LA LLAVE PARA CODIFICAR LAS CONTRASEÑAS
+app.secret_key = b'f83ea3ca1a60a8ae08ae73681c5565870666a30bce8dfdb6a4fe65b9508fdd0a' ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b''
+key = b"\xaf\xf5q'Pg\xf7\xeeC\x9e\xde\xf4FM,\xe6`\xe7\xd8\x01\xa0T\xaam" ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA SERA LA LLAVE PARA CODIFICAR LAS CONTRASEÑAS
 
 # Flask-Mail configuration
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')  # el servidor SMTP de preferencia asociado al servidor del correo es decir si es gmail o outlook etc 
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))  # el puerto del servidor SMTP que se requiere y por el cual se envian los correos
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # VARIABLE DE ENTORNO QUE REPRESENTA EL EMAIL POR DONDE SE VAN A ENVIAR LOS CORREOS ASOCIADOS
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # VARIABLE DE ENTORNO QUE CONTIENE LA CONTRASEÑA DE APLICACIÓN NO DEL EMAIL, SINO LA CONTRASEÑA DE APLICACIÓN QUE SE CREA EN EL PORTAL DE GMAIL O MICROSOFT Y QUE PERMITE ENVIAR CORREOS DESDE EL EMAIL SUMINISTRADO
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # el servidor SMTP de preferencia asociado al servidor del correo es decir si es gmail o outlook etc 
+app.config['MAIL_PORT'] = 587  # el puerto del servidor SMTP que se requiere y por el cual se envian los correos
+app.config['MAIL_USERNAME'] = 'lz7910412@gmail.com'  # VARIABLE DE ENTORNO QUE REPRESENTA EL EMAIL POR DONDE SE VAN A ENVIAR LOS CORREOS ASOCIADOS
+app.config['MAIL_PASSWORD'] = 'zexw bofv jgbc jdyf'  # VARIABLE DE ENTORNO QUE CONTIENE LA CONTRASEÑA DE APLICACIÓN NO DEL EMAIL, SINO LA CONTRASEÑA DE APLICACIÓN QUE SE CREA EN EL PORTAL DE GMAIL O MICROSOFT Y QUE PERMITE ENVIAR CORREOS DESDE EL EMAIL SUMINISTRADO
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME') # Correo desde el cual se envian mensajes si el mensaje no especifica se puede dejar el mismo MAIL_USERNAME
-
-mail = Mail(app)
+app.config['MAIL_DEFAULT_SENDER'] = 'lz7910412@gmail.com' # Correo desde el cual se envian mensajes si el mensaje no especifica se puede dejar el mismo MAIL_USERNAME
+ail = Mail(app)
 
 #Redirige a la pagina de inicio si se carga una página interna sin una sesión iniciada
 def login_required(f):
@@ -85,15 +84,6 @@ def home():
 @app.route('/Registrarse', methods=['GET'])
 def nuevo_usuario():
     resp = make_response(render_template('crear_usuario.html', existe="false"))
-    if request.cookies.get("ingreso") == "true":
-        resp.set_cookie('ingreso', 'false')
-        session.pop('ingreso', None)
-        resp.set_cookie('email', '')
-        session.pop('email', None)
-        resp.set_cookie('nombre1', '')
-        resp.set_cookie('nombre2', '')
-        resp.set_cookie('empresa', '')
-        resp.set_cookie('tipo_user', '')
     return resp
 
 #Cargar registro de admin
@@ -230,45 +220,39 @@ def guardar_contraseña():
 #Registrar nuevo usuario
 @app.route('/Registrar', methods=['POST'])
 def guardar_usuario():
-    nombre1 = request.form.get("nombre1")
-    nombre2 = request.form.get("nombre2")
-    apellido1 = request.form.get("apellido1")
-    apellido2 = request.form.get("apellido2")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
     email = request.form.get("email")
-    contraseña = request.form.get("contraseña1")
-    df = pd.read_excel('usuarios.xlsx')
+    identification = request.form.get("identification")
+    password = request.form.get("password")
+    ## LOS DATOS LLEVAN BIEN CREAMOS EL USUARIO EN EL ESQUEMA DE LA BASE DE DATOS
+    ## ARMAMOS EL BODY
+    object_ = {
+        "first_name":first_name,
+        "last_name":last_name,
+        "email":email,
+        "identification":identification,
+        "password":password,
+        "state":True,
+        "rol":"worker"
+    }
+    ### HACEMOS LA QUERY AL SERVIDOR
+    url = "https://mongorupture.efigasprojecthub.site/rupture/createUser"
 
-    fila = df[(df['email'] == email)]
-    if fila.shape[0] > 0:
-        resp = make_response(render_template('crear_usuario.html',existe="true"))
+    response = requests.post(url,json=object_)
+
+    if(response.json()['status'] == 'Usuario creado con éxito'):
+        flash('Usuario creado con éxito', 'success')
+        return redirect(url_for('salir'))
     else:
-        pw = triple_des(key).encrypt(contraseña, padmode=2)
-        empresa = email.split('@')[1].split('.')[0]
-        df = pd.DataFrame({'Nombre1':[nombre1], 'Nombre2':[nombre2], 'Apellido1':[apellido1], 'Apellido2':[apellido2], 'email':[email], 'contraseña':[pw], 'tipo':[0], 'empresa':[empresa], 'verificado':['no']})
+        ### MOSTRAMOS UNA ALERTA INDICANDO EL PROBLEMA
+        flash('Usuario con cédula ya registrada', 'error')
+        return redirect(url_for('nuevo_usuario'))
 
-        # Cargar el archivo CSV existente
-        try:
-            df_existente = pd.read_excel('usuarios.xlsx')
-            df = pd.concat([df_existente, df], ignore_index=True)
 
-            # Guardar los datos actualizados en el archivo excel
-            df.to_excel('usuarios.xlsx', index=False)
+    
 
-            #Generar token
-            token = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=12))
-            guardar_token(email, token, 1) #Token tipo 1: Verificacion de email
 
-            #Enviar correo
-            verification_link = dominio + "/Verificar?tk=" + token
-            msg = Message('Verifica tu correo electrónico', recipients=[email])
-            msg.body = f"Haz click en el enlace para verificar el correo electrónico: {verification_link}"
-            mail.send(msg)
-        except FileNotFoundError:
-            pass
-        if not os.path.exists("eventos/" + empresa + ".xlsx"):
-            crear_tabla(empresa)
-        resp = make_response(redirect('/Registrado', code=307))
-    return resp
 
 @app.route('/Registrado', methods=['POST'])
 def usuarioEnviado():
@@ -285,7 +269,7 @@ def guardar_admin():
     email = request.form.get("email")
     contraseña = request.form.get("contraseña1")
     df = pd.read_excel('usuarios.xlsx')
-
+    
     fila = df[(df['email'] == email)]
     if fila.shape[0] > 0:
         resp = make_response(render_template('crear_admin.html',existe="true"))

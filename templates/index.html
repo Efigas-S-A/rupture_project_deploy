@@ -51,6 +51,7 @@
       data-tag="font"
     />
     <script src="https://kit.fontawesome.com/697919b5b5.js" crossorigin="anonymous"></script>
+    
   </head>
   <body style="background-image: url('{{ url_for('static', filename='images/Fondo.png') }}')";>
     <link rel="stylesheet" href="./style.css" />
@@ -66,8 +67,9 @@
         </div>
       </div>
     </header>
-
+    
     <div class="inicio-container">
+
         <form class="inicio-cuerpo-container" method="POST" action="http://localhost:5000/Ingresar">
           <div class="inicio-container1">
             <label for="email" Class="inicio-texto01">Correo:</label>
@@ -78,7 +80,7 @@
             <input id="contraseña" name="contraseña" type="password" class="inicio-text-B1"/>
           </div>
           <label for="contraseña" Class="inicio-lblContraseña" onclick="window.location.href ='http://localhost:5000/OlvideMiContraseña';">Olvidé mi contraseña</label>
-          <label id="noResults" class="inicio-label">Usuario y/o contraseña incorrectos</label>
+          <!-- <label id="noResults" class="inicio-label">Usuario y/o contraseña incorrectos</label> -->
           <div class="inicio-container6">
             <button type="submit" class="inicio-ingresar-btn button">
               Ingresar
