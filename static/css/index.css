@@ -72,11 +72,11 @@ body {
 
 .inicio-texto01 {
 
-  font-family:  Helvetica, sans-serif, Arial;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
   font-size: larger;
   align-items: center;
   flex: 1;
-  color: white;
+  color: rgb(227, 227, 227);
 }
 
 .inicio-lblContraseña {
@@ -84,11 +84,13 @@ body {
   font-size: large;
   display: flex;
   align-self: center;
-  color: #0707bc;
+  color: #ffffff;
   text-decoration: underline;
   cursor: pointer;
-  margin-bottom: 2vh;
+  margin-top: 40px;
 }
+
+
 
 .inicio-text-B1 {
 
@@ -155,17 +157,18 @@ body {
 }
 .inicio-ingresar-btn {
   color: var(--dl-color-gray-white);
-  width: 20vh;
-  margin: 1%;
-  font-size: large;
-  font-style: normal;
-  font-family: Helvetica, sans-serif, Arial;
-  font-weight: 600;
-  cursor: pointer;
-  border-color: #6dab3c;
-  border-radius: 10px;
-  background-color: transparent;
-  background-image: linear-gradient(to bottom, rgba(255,255,255,.2) 0, rgba(255,255,255,.01) 100%),linear-gradient(to right, #6dab3c 100%, #6dab3c 100%);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  border: none;
+  background-color: #6dab3c;
+  box-shadow: 10px 10px 10px rgba(0.1, 0.5, 0.1, 0.1);
+  transition: 1s;
+  margin-left: 30px;
+  
+}
+.inicio-ingresar-btn:hover{
+  transform: scale(1.1);
+  background-color: #90cc62 !important;
 }
 
 .inicio-form {

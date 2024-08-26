@@ -140,13 +140,14 @@
     function ponerNombre(){
       var nombre1 = getCookie("nombre1");
       var nombre2 = getCookie("nombre2");
-      if (nombre2 != ""){
-        nombre1 = nombre1 + " " + nombre2
-      }
+      // if (nombre2 != ""){
+      //   nombre1 = nombre1 + " " + nombre2
+      // }
       document.getElementById("banner").innerHTML = "Bienvenido " + nombre1;
     }
 
     function ocultarBoton() {
+      /// PREGUNTAR EL TEMA DEL ADMIN
       if (getCookie("tipo_user") != "1"){
         document.getElementById("crearAdmin").style.display = "none";
       }

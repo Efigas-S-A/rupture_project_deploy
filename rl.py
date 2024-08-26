@@ -13,7 +13,7 @@ import modelos
 import datetime
 import shutil
 
-dominio = "http://localhost:5000" # CAMBIAR AL DOMINIO DE DESPLIEGUE
+dominio = "http://localhost:4500/" # CAMBIAR AL DOMINIO DE DESPLIEGUE
 app = Flask(__name__)
 app.secret_key = b'f83ea3ca1a60a8ae08ae73681c5565870666a30bce8dfdb6a4fe65b9508fdd0a' ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b''
 key = b"\xaf\xf5q'Pg\xf7\xeeC\x9e\xde\xf4FM,\xe6`\xe7\xd8\x01\xa0T\xaam" ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA SERA LA LLAVE PARA CODIFICAR LAS CONTRASEÑAS
@@ -28,47 +28,51 @@ app.config['MAIL_DEFAULT_SENDER'] = 'lz7910412@gmail.com' # Correo desde el cual
 ail = Mail(app)
 
 #Redirige a la pagina de inicio si se carga una página interna sin una sesión iniciada
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('email') is None or session.get('ingreso') is None:
-            return redirect('/Inicio')
-        return f(*args, **kwargs)
-    return decorated_function
+# def login_required(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kwargs):
+#         if session.get('email') is None or session.get('ingreso') is None:
+#             return redirect('/Inicio')
+#         return f(*args, **kwargs)
+#     return decorated_function
 
 #Valida credenciales
 @app.route('/Ingresar', methods=['POST'])
 def iniciar():
-    email = request.form.get('email')
-    contraseña = request.form.get('contraseña')
-
-    # Cargar el archivo Excel utilizando pandas
-    df = pd.read_excel('usuarios.xlsx')
-
-    # Se encripta la contraseña para comparar
-    pw = repr(triple_des(key).encrypt(contraseña, padmode=2))
-
-    # Verificar el inicio de sesión
-    fila = df[(df['email'] == email) & (df['contraseña'] == pw) & (df['verificado'] == "si")]
-    if fila.shape[0] > 0:
-        # Usuario y contraseña válidos
-        # Se construye la respuesta con la redirección y las cookies de usuarios
+    ## OBTENEMOS EL USUARIO
+    identification = request.form.get('identification')
+    password = request.form.get('password')
+    
+    ### LLAMAMOS EL ENDPOINT PARA INGRESAR EL USUARIO
+    object_ = {
+        "identification":identification,
+        "password":password
+    }
+    print("OBJETO: ",object_)
+    ### HACEMOS LA QUERY AL SERVIDOR
+    url = dominio+"rupture/login"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    
+    response = requests.post(url,json=object_)
+    
+    if(response.json()['status'] == 'Registro éxitoso'):
         resp = make_response(redirect("/Perfil"))
         resp.set_cookie('ingreso', 'true')
         session['ingreso'] = True
-        resp.set_cookie('email', email)
-        session['email'] = email
-        resp.set_cookie('nombre1', fila["Nombre1"].values[0])
-        resp.set_cookie('nombre2', fila["Nombre2"].values[0] if not pd.isna(fila["Nombre2"].values[0]) else "")
-        resp.set_cookie('empresa', fila["empresa"].values[0])
-        resp.set_cookie('tipo_user', str(fila["tipo"].values[0]))
+        resp.set_cookie('email', response.json()['email'])
+        session['email'] = response.json()['email']
+        resp.set_cookie('nombre1', response.json()['first_name'])
+        resp.set_cookie('nombre2', response.json()['last_name'])
+        resp.set_cookie('empresa', 'Efigas S.A')
+        resp.set_cookie('tipo_user', 'worker')
+        return resp
     else:
-        # Usuario y/o contraseña incorrectos
+        ### MOSTRAMOS UNA ALERTA INDICANDO EL PROBLEMA
+        flash(response.json()['status'], 'error')
         resp = make_response(redirect("/Inicio", code=307))
-    return resp
+        return resp
+
 
 @app.route('/Perfil')
-@login_required
 def perfil():
     resp = make_response(render_template('principal.html'))
     resp.set_cookie('nuevo', '')
@@ -237,7 +241,7 @@ def guardar_usuario():
         "rol":"worker"
     }
     ### HACEMOS LA QUERY AL SERVIDOR
-    url = "https://mongorupture.efigasprojecthub.site/rupture/createUser"
+    url = dominio+"/rupture/createUser"
 
     response = requests.post(url,json=object_)
 
@@ -365,14 +369,12 @@ def salir():
 
 #Preparar nuevo evento
 @app.route('/NuevoEvento', methods=['POST'])
-@login_required
 def nuevo():
     resp = make_response(render_template('evento.html'))
     resp.set_cookie('guardado', 'false')
     return resp
 
 @app.route('/Resultados', methods=['POST'])
-@login_required
 def nuevoEvento():
     # Se obtienen todas las entradas
 
@@ -398,12 +400,7 @@ def nuevoEvento():
     Tdiametro = request.form.get('DiameTube')
     tiempoInicio = request.form.get('tiempoInicio')
     tiempoFin = request.form.get('tiempoFin')
-
-    if not unico(orden):
-        resp = make_response(redirect("/NuevoEvento", code=307))
-        resp.set_cookie('nuevo', '-1')
-        return resp
-
+    
 
     #Se castean los valores porque a numpy no le gusta usar cadenas
     presionTub = float(presionTub)
@@ -539,25 +536,31 @@ def nuevoEvento():
     hoy = datetime.datetime.now()
     resp = make_response(render_template('resultados.html',Unidades=Unidades,material=material,Tdiametro=round(Tdiametro,2), Volumenfugado=round(Volumenfugado,2),vol_muerto=round(vol_muerto2,2),Subte=subte,Tlargo=TubeLargo,TlargoUni=TlargoUni, orden=orden, area=round(area,2), flujo=round(flujo,2), volumen=round(volumen,2), horas=horas, minutos=minutos, longitud=round(longi,4), latitud=lati, año_reg = hoy.year, mes_reg = hoy.month, dia_reg = hoy.day, año_inicio=tiempoInicio.year, mes_inicio=tiempoInicio.month, dia_inicio=tiempoInicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(convertir("bar", "psig", presionTub),2), presion_atmos=round(convertir("bar", "psig",presionAtmos),2), forma=forma))
     if request.cookies.get('guardado') == "false":
-        guardar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2,medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, hoy, presionAtmos, escape if equi == "on" else 'no')
-        resp.set_cookie('guardado', 'true')
-    return resp
+        result = guardar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2,medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, hoy, presionAtmos, escape if equi == "on" else 'no')
+        if (result):
+            resp.set_cookie('guardado', 'true')
+            return resp
+        else:
+            resp = make_response(redirect("/NuevoEvento", code=307))
+            resp.set_cookie('nuevo', '-1')
+            return resp
+        
+    
 
 @app.route('/CargarBuscar', methods=['POST', 'GET'])
-@login_required
+
 def cargarBuscar():
     resp = make_response(redirect('/BuscarEvento'))
     resp.set_cookie('orden', '')
     return resp
 
 @app.route('/BuscarEvento', methods=['POST', 'GET'])
-@login_required
+
 def renderBuscar():
     resp = make_response(render_template('buscar.html'))
     return resp
 
 @app.route('/Buscar', methods=['POST'])
-@login_required
 def buscar():
     orden = request.form.get('orden')
     # Cargar el archivo Excel utilizando pandas
@@ -581,7 +584,6 @@ def buscar():
         return resp
     
 @app.route('/Reporte', methods=['POST'])
-@login_required
 def reporte():
     orden = request.cookies.get("orden")
     try:
@@ -665,7 +667,6 @@ def reporte():
     #resp = make_response(render_template('resultados.html', orden=orden, area=round(area,2), perimetro=round(perimetro,2), flujo=round(flujo,2), volumen=round(volumen,2), horas=horas, minutos=minutos, longitud=longi, latitud=lati, año_reg = hoy.year, mes_reg = hoy.month, dia_reg = hoy.day, año_inicio=tiempoInicio.year, mes_inicio=tiempoInicio.month, dia_inicio=tiempoInicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(convertir("bar", "psig", presionTub),2), presion_atmos=round(convertir("bar", "psig", presionAtmos),2), forma=forma))
 
 @app.route('/Editar', methods=['POST'])
-@login_required
 def editar():
     orden = request.cookies.get("orden")
     try:
@@ -705,7 +706,6 @@ def editar():
     return resp
 
 @app.route('/Editado', methods=['POST'])
-@login_required
 def editarEvento():
     # Se obtienen todas las entradas
 
@@ -842,7 +842,6 @@ def editarEvento():
     return resp
 
 @app.route('/Aprobar', methods=['POST'])
-@login_required
 def aprobar():
     archivo = "eventos/" + request.cookies.get("empresa") + ".xlsx"
     workbook = load_workbook(archivo)
@@ -857,7 +856,6 @@ def aprobar():
     return make_response(redirect('/Reporte', code=307))
 
 @app.route('/Descargar', methods=['POST'])
-@login_required
 def downloadFile ():
     filtro = request.form.get('actFiltros')
     tiempoInicio = request.form.get('fecha_ini')
@@ -982,59 +980,28 @@ def guardar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_u
     #Se debe editar también la función de creación de tabla y función de aprobación para que
     #el index concuerde con la columna de aprobado
     
-    #Definir como variable para soporte de multiples archivos
-    archivo = "eventos/" + request.cookies.get("empresa") + ".xlsx"
-
-    # Crear un nuevo DataFrame con los datos del evento
-    df = pd.DataFrame({'orden':[orden], 'ubicacion':[ubicacion],'presion':[presion_tube], 'subte':[subte], 'dist_tube':[dist_tube], 'dist_tube_uni':[dist_tube_uni], 'dist_tube2':[dist_tube2], 'dist_tube_uni2':[dist_tube_uni2],'diame_tube':[diame_tube],'Material':[material], 'Unidades':[Unidades] , 'direccion':[dire], 'forma':[forma], 'medida_rupt':[medida_fuga], 'medida_uni':[medida_uni],'medida_rupt2':[medida_fuga2], 'medida_uni2':[medida_uni2], 'area':[area], 'flujo':[flujo], 'volumen':[volumen], 'inicio':[inicio], 'duracion':[duracion], 'hora_reg':[fecha], 'presion_atmos':[presion_atmos], 'volumen_fuga':[volumen_fuga],'volumen_muerto':[volumen_muerto], 'diame_equi':[diame_equi], 'aprobado':'no' })
-
-    # Cargar el archivo CSV existente
-    try:
-        df_existente = pd.read_excel(archivo)
-        df = pd.concat([df_existente, df], ignore_index=True)
-
-        # Guardar los datos actualizados en el archivo excel
-        df.to_excel(archivo, index=False)
-    except FileNotFoundError:
-        pass
-
-    return True
+    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':flujo, 'volumen':volumen, 'inicio':inicio, 'duracion':duracion, 'hora_reg':fecha, 'presion_atmos':presion_atmos, 'volumen_fuga':volumen_fuga,'volumen_muerto':volumen_muerto, 'diame_equi':diame_equi, 'aprobado':'no' }
+    
+    url = dominio+"rupture/createEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    
+    response = requests.post(url,json=objeto_)
+    print("RESPUESTA dawdawd: ",response.json())
+    if(response.json()['status'] == 'Orden creada con éxito'):
+        return True 
+    else:
+        return False
 
 def editar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_uni, dist_tube2, dist_tube_uni2, diame_tube, material, Unidades, dire, forma, medida_fuga, medida_uni,medida_fuga2, medida_uni2, area, flujo, volumen, volumen_muerto, volumen_fuga, inicio, duracion, presion_atmos, diame_equi):
-    archivo = "eventos/" + request.cookies.get("empresa") + ".xlsx"
-    workbook = load_workbook(archivo)
-    sheet = workbook.worksheets[0]
-    for row in sheet.iter_rows():  # Iterando en la primera columna
-        if  str(row[0].value) == str(orden):
-            row[1].value = ubicacion
-            row[2].value = presion_tube
-            row[3].value = subte
-            row[4].value = dist_tube
-            row[5].value = dist_tube_uni
-            row[6].value = dist_tube2
-            row[7].value = dist_tube_uni2
-            row[8].value = diame_tube
-            row[9].value = material
-            row[10].value = Unidades
-            row[11].value = dire
-            row[12].value = forma
-            row[13].value = medida_fuga
-            row[14].value = medida_uni
-            row[15].value = medida_fuga2
-            row[16].value = medida_uni2
-            row[17].value = area
-            row[18].value = flujo
-            row[19].value = volumen
-            row[20].value = inicio
-            row[21].value = duracion
-            row[22].value = presion_atmos
-            row[23].value = volumen_fuga
-            row[24].value = volumen_muerto
-            row[25].value = diame_equi
-            break
-    workbook.save(archivo)
-    workbook.close()
-    return True
+    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':flujo, 'volumen':volumen, 'inicio':inicio, 'duracion':duracion,'presion_atmos':presion_atmos, 'volumen_fuga':volumen_fuga,'volumen_muerto':volumen_muerto, 'diame_equi':diame_equi, 'aprobado':'no' }
+    url = dominio+"rupture/updateEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    
+    response = requests.post(url,json=objeto_)
+    
+    if(response.json()['status'] == "Elemento actualizado exitosamente"):
+        return True 
+    else:
+        return False
+
 
 def guardar_token(email, token, tipo):
     hoy = datetime.datetime.now()
@@ -1053,17 +1020,8 @@ def guardar_token(email, token, tipo):
     return
 
 def unico(orden):
-    # Cargar el archivo Excel utilizando pandas
-    try:
-        df = pd.read_excel("eventos/" + request.cookies.get("empresa") + ".xlsx")
-        # Verificar que la orden exista
-        fila = df[(df['orden'].astype(str).eq(str(orden)))]
-        if fila.shape[0] > 0:
-            return False
-        else:
-            return True
-    except FileNotFoundError or KeyError:
-        return True
+    ### OBTENER SI EL NUMERO DE ORDEN EXISTE 
+    return True
 
 def elevacion(latitud, longitud):
     valor = 0

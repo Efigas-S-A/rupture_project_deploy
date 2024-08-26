@@ -123,9 +123,9 @@
             </div>
             <div class="Evento-Numerodeorden">
               <label for="ubicacion" class="Evento-label1">Ubicación:</label>
-              <div>
+              <div class="inputUbi">
                 <input type="text" id="ubicacion" name="ubicacion" required class="evento-txt-ubica" autocomplete="off" onkeydown="return false;" style="caret-color: transparent !important;"  />
-                <button type="button" class="evento-button1 button" onclick="obtenerUbicacion()"><i class="fa fa-location-dot"></i></button>
+                <button type="button" class="evento-button1 button buttonCustomUbi" onclick="obtenerUbicacion()"><i class="fa fa-location-dot positionIcon"></i></button>
               </div>
             </div>
             <div class="Evento-Numerodeorden">
@@ -260,9 +260,9 @@
                 </li>
               </ul>
             </div>
-            <div class="Evento-Caracteristicas2">
-              <div class="Evento-Caracteristicas4">
-                <label for="DistTube" class="Evento-label2">Distancia de la válvula:</label>
+            <div class="Evento-CaracteristicasV2">
+              <div class="Evento-CaracteristicasV2">
+                <label for="DistTube" class="Evento-label2 labelDistance">Distancia de la válvula:</label>
                 <div>
                   <input
                     type="number"
@@ -281,7 +281,7 @@
               </div>
               <div id="Tube2" class="Evento-Caracteristicas4" style="display: none;">
                 <label for="DistTube2" class="Evento-label2">Distancia de 2da válvula:</label>
-                <div>
+                <div class="centerInput">
                   <input
                     type="number"
                     id="DistTube2"
@@ -386,7 +386,7 @@
         </div>
         <div class="evento-container26">
           <label id="noOrden" class="evento-label">Orden ya existe</label>
-          <button type="submit" class="evento-button1 button">
+          <button type="submit" class="evento-button2 button">
             Enviar
           </button>
         </div>
