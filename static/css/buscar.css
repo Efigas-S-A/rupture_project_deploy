@@ -124,8 +124,8 @@ body {
   justify-content: center;
 }
 .buscar-text {
-  font-family: Helvetica, sans-serif, Arial;
-  color: white;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  color: rgb(214, 214, 214);
 }
 .buscar-txt-orden {
   font-size: medium;
@@ -151,19 +151,29 @@ body {
 }
 .buscar-report-btn {
   color: var(--dl-color-gray-white);
-  width: var(--dl-size-size-xlarge);
-  font-family: Montserrat;
-  margin-left: 3%;
-  border-color: #6dab3c;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.2) 0px, rgba(255, 255, 255, 0.01) 100%),linear-gradient(to right, rgb(109, 171, 60) 100%, rgb(109, 171, 60) 100%);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #6dab3c;
+  box-shadow: 10px 10px 10px rgba(0.1, 0.5, 0.1, 0.1);
+  transition: 1s;
 }
 .buscar-orden-btn {
   color: var(--dl-color-gray-white);
-  width: var(--dl-size-size-xlarge);
-  font-family: Montserrat;
-  border-color: #6dab3c;
-  width: auto;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.2) 0px, rgba(255, 255, 255, 0.01) 100%),linear-gradient(to right, rgb(109, 171, 60) 100%, rgb(109, 171, 60) 100%);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  width: 50px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background-color: #6dab3c;
+  box-shadow: 10px 10px 10px rgba(0.1, 0.5, 0.1, 0.1);
+  transition: 1s;
+  margin-left: 10px;
 }
 .buscar-footer {
   position: fixed;

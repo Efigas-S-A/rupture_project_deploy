@@ -403,6 +403,7 @@ def nuevoEvento():
     
 
     #Se castean los valores porque a numpy no le gusta usar cadenas
+    
     presionTub = float(presionTub)
     Fdiametro = float(Fdiametro) if Fdiametro != "" else 0
     Tlargo = float(Tlargo) if Tlargo != "" else 0
@@ -534,6 +535,7 @@ def nuevoEvento():
         vol_muerto2 = round(vol_muerto, 2)
     
     hoy = datetime.datetime.now()
+    vol_muerto2 = float(vol_muerto2)
     resp = make_response(render_template('resultados.html',Unidades=Unidades,material=material,Tdiametro=round(Tdiametro,2), Volumenfugado=round(Volumenfugado,2),vol_muerto=round(vol_muerto2,2),Subte=subte,Tlargo=TubeLargo,TlargoUni=TlargoUni, orden=orden, area=round(area,2), flujo=round(flujo,2), volumen=round(volumen,2), horas=horas, minutos=minutos, longitud=round(longi,4), latitud=lati, año_reg = hoy.year, mes_reg = hoy.month, dia_reg = hoy.day, año_inicio=tiempoInicio.year, mes_inicio=tiempoInicio.month, dia_inicio=tiempoInicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(convertir("bar", "psig", presionTub),2), presion_atmos=round(convertir("bar", "psig",presionAtmos),2), forma=forma))
     if request.cookies.get('guardado') == "false":
         result = guardar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2,medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, hoy, presionAtmos, escape if equi == "on" else 'no')
@@ -563,134 +565,136 @@ def renderBuscar():
 @app.route('/Buscar', methods=['POST'])
 def buscar():
     orden = request.form.get('orden')
-    # Cargar el archivo Excel utilizando pandas
-    try:
-        df = pd.read_excel("eventos/" + request.cookies.get("empresa") + ".xlsx")
-
-        # Verificar que la orden exista
-        
-        fila = df[(df['orden'].astype(str).eq(str(orden)))]
-        if fila.shape[0] > 0:
-            resp = make_response(redirect('/Reporte', code=307))
-            resp.set_cookie('orden', orden)
-            return resp
-        else:
-            resp = make_response(redirect('/BuscarEvento'))
-            resp.set_cookie('orden', '-1')
-            return resp
-    except FileNotFoundError or KeyError:
+    ## OBTENEMOS LA ORDEN EN FORMATO STRING 
+    objeto_ = {'orden':orden }
+    
+    url = dominio+"rupture/getSpecificEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    
+    print("DATOS QUERY: ",url,objeto_)
+    response = requests.post(url,json=objeto_)
+    if(response.json()['status'] == 'Si hay elemento'):
+        resp = make_response(redirect('/Reporte', code=307))
+        resp.set_cookie('orden', orden)
+        return resp 
+    else:
         resp = make_response(redirect('/BuscarEvento'))
         resp.set_cookie('orden', '-1')
         return resp
     
+    
+
+
+
 @app.route('/Reporte', methods=['POST'])
 def reporte():
     orden = request.cookies.get("orden")
-    try:
-        df = pd.read_excel("eventos/" + request.cookies.get("empresa") + ".xlsx")
 
-        # Verificar que la orden exista
-        fila = df[(df['orden'].astype(str).eq(str(orden)))]
-        if fila.shape[0] > 0:
-            ubicacion = fila["ubicacion"].values[0]
-            presion = float(fila["presion"].values[0])
-            subte = fila["subte"].values[0]
-            dist_tube = float(fila["dist_tube"].values[0])
-            dist_tube_uni = fila["dist_tube_uni"].values[0]
-            dist_tube2 = float(fila["dist_tube2"].values[0])
-            dist_tube_uni2 = fila["dist_tube_uni2"].values[0]
-            diame_tube = float(fila["diame_tube"].values[0])
-            Unidades = fila["Unidades"].values[0]
-            material = fila["Material"].values[0]
-            direccion = fila["direccion"].values[0]
-            forma = fila["forma"].values[0]
-            area = float(fila["area"].values[0])
-            flujo = float(fila["flujo"].values[0])
-            volumen = float(fila["volumen"].values[0])
-            aprobado = fila["aprobado"].values[0]
-            volumen_muerto = float(fila["volumen_muerto"].values[0])
-            volumen_fuga = float(fila["volumen_fuga"].values[0])
-            inicio = pd.Timestamp(fila["inicio"].values[0]).to_pydatetime()
-            duracion = fila["duracion"].values[0]
-            hora_reg = pd.Timestamp(fila["hora_reg"].values[0]).to_pydatetime()
-            presion_atmos = float(fila["presion_atmos"].values[0])
-            duracion = float(duracion)
-            horas = int(duracion // 3600)
-            horasQ = duracion % 3600
-            minutos = int(horasQ // 60)
-            #Separar los componentes de la ubicacion
-            lati = float(ubicacion.split(",")[0])
-            longi = float(ubicacion.split(",")[1])
+    ## OBTENEMOS LA ORDEN EN FORMATO STRING 
+    objeto_ = {'orden':orden }
+    
+    url = dominio+"rupture/getSpecificEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    
+    print("DATOS QUERY: ",url,objeto_)
+    response = requests.post(url,json=objeto_)
+    if(response.json()['status'] == 'Si hay elemento'):
+        fila = response.json()['info']
+        ubicacion = fila["ubicacion"]
+        presion = float(fila["presion"])
+        subte = fila["subte"]
+        dist_tube = float(fila["dist_tube"])
+        dist_tube_uni = fila["dist_tube_uni"]
+        dist_tube2 = float(fila["dist_tube2"])
+        dist_tube_uni2 = fila["dist_tube_uni2"]
+        diame_tube = float(fila["diame_tube"])
+        Unidades = fila["Unidades"]
+        material = fila["Material"]
+        direccion = fila["direccion"]
+        forma = fila["forma"]
+        area = float(fila["area"])
+        flujo = float(fila["flujo"])
+        volumen = float(fila["volumen"])
+        aprobado = fila["aprobado"]
+        volumen_muerto = float(fila["volumen_muerto"])
+        volumen_fuga = float(fila["volumen_fuga"])
+        inicio = pd.Timestamp( datetime.datetime.strptime(fila["inicio"], '%Y-%m-%d %H:%M')).to_pydatetime()
+        duracion = fila["duracion"]
+        hora_reg = pd.Timestamp( datetime.datetime.strptime(fila["hora_reg"], '%Y-%m-%d %H:%M')).to_pydatetime()
+        presion_atmos = float(fila["presion_atmos"])
+        duracion = float(duracion)
+        horas = int(duracion // 3600)
+        horasQ = duracion % 3600
+        minutos = int(horasQ // 60)
+        #Separar los componentes de la ubicacion
+        lati = float(ubicacion.split(",")[0])
+        longi = float(ubicacion.split(",")[1])
 
-            largo2 = convertir(dist_tube_uni2, dist_tube_uni, dist_tube2)
-            largo = dist_tube + largo2
+        largo2 = convertir(dist_tube_uni2, dist_tube_uni, dist_tube2)
+        largo = dist_tube + largo2
 
-            if flujo < 1:
-                if round(flujo, 2) == 0:
-                    flujo2 = "{:.2e}".format(flujo)
-                else:
-                    flujo2 = round(flujo, 2)
+        if flujo < 1:
+            if round(flujo, 2) == 0:
+                flujo2 = "{:.2e}".format(flujo)
             else:
                 flujo2 = round(flujo, 2)
-            if volumen < 1:
-                if round(volumen, 2) == 0:
-                    volumen2 = "{:.2e}".format(volumen)
-                else:
-                    volumen2 = round(volumen, 2)
+        else:
+            flujo2 = round(flujo, 2)
+        if volumen < 1:
+            if round(volumen, 2) == 0:
+                volumen2 = "{:.2e}".format(volumen)
             else:
                 volumen2 = round(volumen, 2)
-            if volumen_fuga < 1:
-                if round(volumen_fuga, 2) == 0:
-                    volumen_fuga2 = "{:.2e}".format(volumen_fuga)
-                else:
-                    volumen_fuga2 = round(volumen_fuga, 2)
+        else:
+            volumen2 = round(volumen, 2)
+        if volumen_fuga < 1:
+            if round(volumen_fuga, 2) == 0:
+                volumen_fuga2 = "{:.2e}".format(volumen_fuga)
             else:
                 volumen_fuga2 = round(volumen_fuga, 2)
-            if volumen_muerto < 1:
-                if round(volumen_muerto, 2) == 0:
-                    vol_muerto2 = "{:.2e}".format(volumen_muerto)
-                else:
-                    vol_muerto2 = round(volumen_muerto, 2)
+        else:
+            volumen_fuga2 = round(volumen_fuga, 2)
+        if volumen_muerto < 1:
+            if round(volumen_muerto, 2) == 0:
+                vol_muerto2 = "{:.2e}".format(volumen_muerto)
             else:
                 vol_muerto2 = round(volumen_muerto, 2)
-
-            resp = make_response(render_template('reporte.html',material=material, Unidades=Unidades,diame_tube=round(diame_tube,2), orden = orden, Volumenfugado=volumen_fuga2, vol_muerto=vol_muerto2,Subte=subte,Tlargo=largo,TlargoUni=dist_tube_uni, area=round(area,2), flujo=flujo2, volumen=volumen2, horas=horas, minutos=minutos, longitud=longi, latitud=lati, año_reg = hora_reg.year, mes_reg = hora_reg.month, dia_reg = hora_reg.day, año_inicio=inicio.year, mes_inicio=inicio.month, dia_inicio=inicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(presion,2), presion_atmos=round(convertir("bar", "psig",presion_atmos),2), forma=forma, aprobado = aprobado))
-            return resp
         else:
-            resp = make_response(redirect('/BuscarEvento'))
-            resp.set_cookie('orden', '-1')
-            return resp
-    except FileNotFoundError:
-        resp = make_response(redirect('/BuscarEvento'))
-        resp.set_cookie('orden', '-2')
+            vol_muerto2 = round(volumen_muerto, 2)
+
+        resp = make_response(render_template('reporte.html',material=material, Unidades=Unidades,diame_tube=round(diame_tube,2), orden = orden, Volumenfugado=volumen_fuga2, vol_muerto=vol_muerto2,Subte=subte,Tlargo=largo,TlargoUni=dist_tube_uni, area=round(area,2), flujo=flujo2, volumen=volumen2, horas=horas, minutos=minutos, longitud=longi, latitud=lati, año_reg = hora_reg.year, mes_reg = hora_reg.month, dia_reg = hora_reg.day, año_inicio=inicio.year, mes_inicio=inicio.month, dia_inicio=inicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(presion,2), presion_atmos=round(convertir("bar", "psig",presion_atmos),2), forma=forma, aprobado = aprobado))
         return resp
-    #resp = make_response(render_template('resultados.html', orden=orden, area=round(area,2), perimetro=round(perimetro,2), flujo=round(flujo,2), volumen=round(volumen,2), horas=horas, minutos=minutos, longitud=longi, latitud=lati, año_reg = hoy.year, mes_reg = hoy.month, dia_reg = hoy.day, año_inicio=tiempoInicio.year, mes_inicio=tiempoInicio.month, dia_inicio=tiempoInicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(convertir("bar", "psig", presionTub),2), presion_atmos=round(convertir("bar", "psig", presionAtmos),2), forma=forma))
+    else:
+        resp = make_response(redirect('/BuscarEvento'))
+        resp.set_cookie('orden', '-1')
+        return resp
+
 
 @app.route('/Editar', methods=['POST'])
 def editar():
     orden = request.cookies.get("orden")
-    try:
-        df = pd.read_excel("eventos/" + request.cookies.get("empresa") + ".xlsx")
-        
-        # Verificar que la orden exista
-        fila = df[(df['orden'].astype(str).eq(str(orden)))]
-        if fila.shape[0] > 0:
-            ubicacion = fila["ubicacion"].values[0]
-            presion = fila["presion"].values[0]
-            subte = fila["subte"].values[0]
-            dist_tube = fila["dist_tube"].values[0]
-            dist_tube_uni = fila["dist_tube_uni"].values[0]
-            dist_tube2 = fila["dist_tube2"].values[0] if fila["dist_tube2"].values[0] > 0 else ""
-            dist_tube_uni2 = fila["dist_tube_uni2"].values[0]
-            diame_tube = fila["diame_tube"].values[0]
-            flujo = fila["direccion"].values[0]
-            forma = fila["forma"].values[0]
-            medida_rupt = fila["medida_rupt"].values[0]
-            medida_uni = fila["medida_uni"].values[0]
-            inicio = pd.Timestamp(fila["inicio"].values[0]).to_pydatetime()
-            duracion = int(fila["duracion"].values[0])
-            diame_equi = fila["diame_equi"].values[0]
-
+    ## OBTENEMOS LA ORDEN EN FORMATO STRING 
+    objeto_ = {'orden':orden }
+    
+    url = dominio+"rupture/getSpecificEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    
+    print("DATOS QUERY: ",url,objeto_)
+    response = requests.post(url,json=objeto_)
+    if(response.json()['status'] == 'Si hay elemento'):
+            fila = response.json()['info']
+            ubicacion = fila["ubicacion"]
+            presion = fila["presion"]
+            subte = fila["subte"]
+            dist_tube = fila["dist_tube"]
+            dist_tube_uni = fila["dist_tube_uni"]
+            dist_tube2 = fila["dist_tube2"] if fila["dist_tube2"] > 0 else ""
+            dist_tube_uni2 = fila["dist_tube_uni2"]
+            diame_tube = fila["diame_tube"]
+            flujo = fila["direccion"]
+            forma = fila["forma"]
+            medida_rupt = fila["medida_rupt"]
+            medida_uni = fila["medida_uni"]
+            inicio = pd.Timestamp(datetime.datetime.strptime(fila["inicio"], '%Y-%m-%d %H:%M')).to_pydatetime()
+            duracion = int(fila["duracion"])
+            diame_equi = fila["diame_equi"]
             diame_tube = float_a_int(float(diame_tube))
             delta = datetime.timedelta(seconds=duracion)
             fin = inicio + delta
@@ -698,17 +702,15 @@ def editar():
             fecha_fin = fin.strftime('%Y-%m-%dT%H:%M')
 
             resp = make_response(render_template("editar.html", orden=orden, ubicacion=ubicacion, tiempoInicio=fecha_inicio, tiempoFin=fecha_fin, presion=round(presion,0), DiameTube=diame_tube, Flujo=flujo, DistTube=dist_tube, DistTubeUni=dist_tube_uni, DistTube2=dist_tube2, DistTubeUni2=dist_tube_uni2, subte=subte, Forma=forma, diameEqui=diame_equi,medida_rupt=medida_rupt,medida_uni=medida_uni))
-        else:
-            resp = make_response("Orden no existe")
-    except:
+    else:
         resp = make_response("Error al abrir el archivo")
-    resp.set_cookie('guardado', 'false')
+    
     return resp
 
 @app.route('/Editado', methods=['POST'])
 def editarEvento():
     # Se obtienen todas las entradas
-
+    
     orden = request.form.get('orden')
     ubicacion = request.form.get('ubicacion')
     presionTub = request.form.get('presion')
@@ -837,7 +839,8 @@ def editarEvento():
     
     resp = make_response(redirect("/Reporte", code=307))
     if request.cookies.get('guardado') == "false":
-        editar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2, medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, presionAtmos, escape if equi == "on" else 'no')
+        response = editar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2, medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, presionAtmos, escape if equi == "on" else 'no')
+        print("EDITADO? ",response)
         resp.set_cookie('guardado', 'true')
     return resp
 
@@ -980,10 +983,11 @@ def guardar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_u
     #Se debe editar también la función de creación de tabla y función de aprobación para que
     #el index concuerde con la columna de aprobado
     
-    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':flujo, 'volumen':volumen, 'inicio':inicio, 'duracion':duracion, 'hora_reg':fecha, 'presion_atmos':presion_atmos, 'volumen_fuga':volumen_fuga,'volumen_muerto':volumen_muerto, 'diame_equi':diame_equi, 'aprobado':'no' }
+    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':float(flujo), 'volumen':float(volumen), 'inicio':inicio.strftime('%Y-%m-%d %H:%M'), 'duracion':duracion, 'hora_reg':fecha.strftime('%Y-%m-%d %H:%M'), 'presion_atmos':float(presion_atmos), 'volumen_fuga':float(volumen_fuga),'volumen_muerto':float(volumen_muerto), 'diame_equi':diame_equi, 'aprobado':'no' }
     
     url = dominio+"rupture/createEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
     
+    print("DATOS QUERY: ",url,objeto_)
     response = requests.post(url,json=objeto_)
     print("RESPUESTA dawdawd: ",response.json())
     if(response.json()['status'] == 'Orden creada con éxito'):
@@ -992,12 +996,12 @@ def guardar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_u
         return False
 
 def editar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_uni, dist_tube2, dist_tube_uni2, diame_tube, material, Unidades, dire, forma, medida_fuga, medida_uni,medida_fuga2, medida_uni2, area, flujo, volumen, volumen_muerto, volumen_fuga, inicio, duracion, presion_atmos, diame_equi):
-    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':flujo, 'volumen':volumen, 'inicio':inicio, 'duracion':duracion,'presion_atmos':presion_atmos, 'volumen_fuga':volumen_fuga,'volumen_muerto':volumen_muerto, 'diame_equi':diame_equi, 'aprobado':'no' }
+    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':float(flujo), 'volumen':float(volumen), 'inicio':inicio.strftime('%Y-%m-%d %H:%M'), 'duracion':duracion, 'presion_atmos':float(presion_atmos), 'volumen_fuga':float(volumen_fuga),'volumen_muerto':float(volumen_muerto), 'diame_equi':diame_equi, 'aprobado':'no' }
     url = dominio+"rupture/updateEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
     
     response = requests.post(url,json=objeto_)
     
-    if(response.json()['status'] == "Elemento actualizado exitosamente"):
+    if(response.json()['success']):
         return True 
     else:
         return False

@@ -121,11 +121,11 @@
                 <label for="orden" class="Evento-label1">Número de orden:</label>
                 <input type="text" id="orden" name="orden" required="" class="evento-txt-orden" readonly/>
               </div>
-              <div class="Evento-Numerodeorden">
+              <div class="Evento-Numerodeorden ">
                 <label for="ubicacion" class="Evento-label1">Ubicación:</label>
-                <div>
+                <div class="inputUbi">
                   <input type="text" id="ubicacion" name="ubicacion" required class="evento-txt-ubica" autocomplete="off" onkeydown="return false;" style="caret-color: transparent !important;"  />
-                  <button type="button" class="evento-button1 button" onclick="obtenerUbicacion()"><i class="fa fa-location-dot"></i></button>
+                  <button type="button" class="evento-button1 button buttonCustomUbi" onclick="obtenerUbicacion()"><i class="fa fa-location-dot"></i></button>
                 </div>
               </div>
               <div class="Evento-Numerodeorden">
@@ -385,8 +385,8 @@
             </div>
           </div>
           <div class="evento-container26">
-            <button type="submit" class="evento-button1 button">
-              Enviar
+            <button type="submit" class="evento-button2 button">
+              Actualizar
             </button>
           </div>
       </form>

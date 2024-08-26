@@ -71,7 +71,7 @@ html, body {
   width: 100%;
   justify-self: center;
   text-align: center;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: bold;
   font-size: large;
   margin-bottom: 1%;
@@ -90,7 +90,7 @@ html, body {
     "Subgrid1 Subgrid2";
   width: 100%;
   justify-self:center;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
   font-size: large;
   margin-bottom: 1%;
   color: white;
@@ -116,7 +116,7 @@ html, body {
 
 .grid-titulo {
   text-align: center;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
   font-weight: bold;
   font-size: large;
 }
@@ -126,59 +126,59 @@ html, body {
   display: grid;
   height: 3.791982665222102vh;
   grid-template-columns: 1fr 1.2fr;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   justify-content: flex-start;
 }
 
 .Evento-label1{
   margin-left: 3.2502708559046587vh;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: large;
   align-content: center;
-  color: white;
+  color: rgba(235, 235, 235, 0.959);
 
 }
 
 .evento-txt-orden {
-  width: 80%;
-  font-size:medium;
-  font-family: Helvetica, sans-serif, Arial;
-  height: 4vh;
+  width: 200px;
+  font-size:small;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  height: 23px;
   color: var(--dl-color-gray-black);
   cursor: auto;
   padding: 0.5rem 1rem;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  border-radius: 4px;
+  border-color: #fff;
+  border-width: 0px;
+  border-radius: 20px;
   background-color: var(--dl-color-gray-white);
   text-align: center;
 }
 
 .evento-txt-ubica {
-  width: 70%;
+  width:  200px;
   font-size: medium;
-  font-family: Helvetica, sans-serif, Arial;
-  height: 4vh;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  height: 23px;
   color: var(--dl-color-gray-black);
   cursor: auto;
   padding: 0.5rem 1rem;
-  border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  border-radius: 4px;
+  border-color: #fff;
+  border-width: 0px;
+  border-radius: 20px;
   background-color: var(--dl-color-gray-white);
 }
 
 .evento-txt-fecha {
-  width: 80%;
+  width: 200px;
   font-size:medium;
-  font-family: Helvetica, sans-serif, Arial;
-  height: 4vh;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  height: 23px;
   color: var(--dl-color-gray-black);
   cursor: auto;
   padding: 0.5rem 1rem;
   border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  border-radius: 4px;
+  border-width: 0px;
+  border-radius: 20px;
   background-color: var(--dl-color-gray-white);
   text-align: center;
 }
@@ -187,39 +187,40 @@ i.fa-location-dot {
   height: 3vh !important; /* Cambia la altura del icono a 32 píxeles */
 }
 .evento-txt-presion {
-  width: 60%;
+  width: 200px;
   font-size: medium;
-  font-family: Helvetica, sans-serif, Arial;
-  height: 4vh;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  height: 23px;
   color: var(--dl-color-gray-black);
   cursor: auto;
   text-align: center;
   border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  border-radius: 4px;
+  border-width: 0px;
+  border-radius: 20px;
   background-color: var(--dl-color-gray-white);
 }
 .evento-txt-diametro {
-  width: 25%;
+  width: 200px;
   font-size: medium;
-  font-family: Helvetica, sans-serif, Arial;
-  height: 4vh;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  height: 23px;
   color: var(--dl-color-gray-black);
   cursor: auto;
   text-align: center;
   border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  border-radius: 4px;
+  border-width: 0px;
+  border-radius: 20px;
   background-color: var(--dl-color-gray-white);
 }
 .evento-presion-uni {
+  width: 60px;
   align-self: center;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: medium;
-  height: 4vh;
+  height: 23px;
   border-color: var(--dl-color-gray-black);
-  border-width: 1px;
-  border-radius: var(--dl-radius-radius-radius4);
+  border-width: 0px;
+  border-radius: 20px;
 }
 
 .Subgrid2 {  display: grid;
@@ -244,7 +245,7 @@ i.fa-location-dot {
   display: grid;
   height: auto;
   grid-template-columns: 1fr 2fr;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   justify-content: flex-start;
   align-content: center;
 }
@@ -254,7 +255,21 @@ i.fa-location-dot {
   display: grid;
   height: auto;
   grid-template-columns: 1fr 1fr;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  justify-content: flex-start;
+  align-content: center;
+}
+
+.Evento-CaracteristicasV2{
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  grid-template-columns: 1fr;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   justify-content: flex-start;
   align-content: center;
 }
@@ -264,27 +279,30 @@ i.fa-location-dot {
   display: grid;
   height: auto;
   grid-template-columns: 2fr 1fr;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   justify-content: flex-start;
   align-content: center;
 }
 
 .Evento-Caracteristicas4{
   flex: 0 0 auto;
-  display: grid;
-  height: auto;
-  grid-template-columns: 1fr 1fr;
-  font-family: Helvetica, sans-serif, Arial;
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   justify-content: flex-start;
   align-content: center;
 }
 
 .Evento-label2{
   margin-left: 3.2502708559046587vh;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: large;
   align-content: center;
-  color: white;
+  color: rgba(235, 235, 235, 0.959);
+
 
 }
 
@@ -338,7 +356,7 @@ i.fa-location-dot {
 .evento-text04 {
   margin-left: 1%;
   color: white;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .evento-li2 {
@@ -396,7 +414,7 @@ i.fa-location-dot {
 .Evento-label3{
   margin-left: 3.2502708559046587vh;
   width: 15vh;
-  font-family: Helvetica, sans-serif, Arial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   color: white;
   font-size: large;
   align-content: center;
@@ -406,15 +424,24 @@ i.fa-location-dot {
 .evento-main-logo {
   max-width: 25%;
   max-height: 70%;
-  margin-left: 4vh;
   object-fit: cover;
-  cursor: pointer;
 }
 
 .evento-list-item1 {
   text-align: center;
 }
-
+.inputUbi{
+  display: flex;
+  flex-direction: row;
+}
+.positionIcon{
+  position: relative;
+  top:4px
+}
+.buttonCustomUbi{
+  position: relative;
+  bottom: 5px;
+}
 .evento-container26 {
   width: 100%;
   height: 7vh;
@@ -427,12 +454,48 @@ i.fa-location-dot {
 }
 .evento-button1 {
   color: var(--dl-color-gray-white);
-  font-family: Montserrat;
-  border-color: #6dab3c;
-  background-color: transparent;
-  background-image: linear-gradient(to bottom, rgba(255,255,255,.2) 0, rgba(255,255,255,.01) 100%),linear-gradient(to right, #6dab3c 100%, #6dab3c 100%);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: none;
+  background-color: #6dab3c;
+  box-shadow: 10px 10px 10px rgba(0.1, 0.5, 0.1, 0.1);
+  transition: 1s;
+  margin-left: 10px;
 }
 
+
+
+.evento-button1:hover{
+  transform: scale(1.1);
+  background-color: #90cc62 !important;
+}
+.evento-button2 {
+  color: var(--dl-color-gray-white);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: #6dab3c;
+  box-shadow: 10px 10px 10px rgba(0.1, 0.5, 0.1, 0.1);
+  transition: 1s;
+  margin-left: 10px;
+  position: relative;
+  bottom: 20px;
+}
+
+
+
+.evento-button2:hover{
+  transform: scale(1.1);
+  background-color: #90cc62 !important;
+}
 
 .evento-footer {
   position: fixed;
@@ -447,30 +510,35 @@ i.fa-location-dot {
 
 .evento-utp-container {
   flex: 2 2 auto;
-  width: 70%;
+  width: 67%;
   height: 100%;
+  margin-left: 3%;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.evento-gasostenible-logo {
+  max-width: 25%;
+  max-height: 70%;
+  object-fit: cover;
+}
+
 .evento-UTP-logo{
   max-width: 25%;
-  margin: 1.1vh;
   object-fit: cover;
-  max-height: 70%;
+  max-height: 60%;
 }
 
 .evento-genergetica-logo{
   max-width: 25%;
   max-height: 70%;
-  margin: 1.1vh;
   object-fit: cover;
 }
 
 .evento-slogan-container {
   flex: 0 0 auto;
-  width: 34%;
+  width: 25%;
   height: 100%;
   display: flex;
   align-items: center;
@@ -478,8 +546,8 @@ i.fa-location-dot {
   justify-content: center;
 }
 .evento-slogan {
-  font-family: Montserrat;
-  font-size: 2vw;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 1.2vw;
   font-weight: 500;
   color: black;
   max-height: 70%;
@@ -487,6 +555,7 @@ i.fa-location-dot {
   text-align: center;
 }
 .evento-label {
+  display: none;
   padding: 1vh;
   margin-bottom: 2vh;
   border-radius:1vh;
@@ -504,6 +573,18 @@ i.fa-location-dot {
       "Subgrid1"
       "Subgrid2";
     gap: 2%;
+  }
+}
+
+@media (max-width: 720px) {
+  .evento-slogan-container {
+    display: none;
+  }
+  .evento-utp-container {
+    width: 97%;
+  }
+  .evento-UTP-logo {
+    max-height: 40%;
   }
 }
 
