@@ -13,7 +13,8 @@ import modelos
 import datetime
 import shutil
 
-dominio = "https://mongo.efigasrupture.online/" # CAMBIAR AL DOMINIO DE DESPLIEGUE
+
+dominio = "https://proyectorupturasmd.efigas.com.co/" # CAMBIAR AL DOMINIO DE DESPLIEGUE
 app = Flask(__name__)
 app.secret_key = b'f83ea3ca1a60a8ae08ae73681c5565870666a30bce8dfdb6a4fe65b9508fdd0a' ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b''
 key = b"\xaf\xf5q'Pg\xf7\xeeC\x9e\xde\xf4FM,\xe6`\xe7\xd8\x01\xa0T\xaam" ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA SERA LA LLAVE PARA CODIFICAR LAS CONTRASEÑAS
@@ -219,7 +220,6 @@ def guardar_contraseña():
     wb_tk.close()
     wb_us.close()
     return resp
-
 
 #Registrar nuevo usuario
 @app.route('/Registrar', methods=['POST'])
