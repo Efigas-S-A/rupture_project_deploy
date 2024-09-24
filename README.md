@@ -119,7 +119,7 @@ Las variables a crear son:
 Para verificar donde se usan dichas variables, mirar el archivo rl.py lineas 18 a la 27
 
 FINALMENTE EN CASO DE QUE LA APLICACIÓN ESTE SIENDO DESPLEGADA CON UN DOMINIO DETERMINADO SERA NECESARIO EDITAR TODAS LAS PORCIONES DE CODIGO DONDE SE TIENE
-https://proyectorupturas.efigas.com.co/ => dominio respectivo. ejemplo https://ruptures.projecthub.site
+https://proyectorupturasmd.efigas.com.co/ => dominio respectivo. ejemplo https://ruptures.projecthub.site
 
 
 ## RECOMENDACIONES
