@@ -62,7 +62,7 @@
   <body style="background-image: url('{{ url_for('static', filename='images/Fondo.png') }}')";>
     <div class="buscar-header">
         <div class="buscar-app-container">
-          <form method="GET" action="https://proyectorupturasmd.efigas.com.co//Inicio">
+          <form method="GET" action="http://127.0.0.1:5000//Inicio">
             <button type="submit" class="buscar-button button">
               <i class="fa fa-right-from-bracket"></i>
             </button>
@@ -71,7 +71,7 @@
             alt="Logo FuGas"
             src="{{ url_for('static', filename='images/logos/RL_logo.png') }}"
             class="buscar-app-logo"
-            onclick="window.location.href ='https://proyectorupturasmd.efigas.com.co//Perfil';"
+            onclick="window.location.href ='http://127.0.0.1:5000//Perfil';"
           />
         </div>
     </div>
@@ -81,7 +81,7 @@
           <h1 id="banner" name="banner" class="buscar-text">Número de orden:</h1>
         </div>
         <div class="buscar-container4">
-          <form method="POST" action="https://proyectorupturasmd.efigas.com.co//Buscar">
+          <form method="POST" action="http://127.0.0.1:5000//Buscar">
             <input type="text" id="orden" name="orden" required="" class="buscar-txt-orden input" />
             <button type="submit" class="buscar-orden-btn button">
               <i class="fa fa-magnifying-glass"></i>
@@ -90,7 +90,7 @@
           <label id="noResults" class="buscar-label">Sin resultados</label>
         </div>
         <div class="buscar-container4">
-          <form method="POST" class="Filtro-forma" action="https://proyectorupturasmd.efigas.com.co//Descargar">
+          <form method="POST" class="Filtro-forma" action="http://127.0.0.1:5000//Descargar">
             <!-- <div>
               <label class="Filtro-label1">Filtrar por fecha:</label>
               <input type="checkbox" id="actFiltros" name="actFiltros" class="filtro-check" onclick="mostrarFiltros()"></input>
@@ -101,9 +101,9 @@
               <label for="fecha_final" class="Filtro-label1">Fecha final:</label>
               <input type="date" class="evento-txt-orden" id="fecha_final" name="fecha_final" onfocus="this.showPicker()" oninput="fechaMaxima()"></input>
             </div> -->
-            <!-- <button id="descargarBoton" type="submit" class="buscar-report-btn button">
+            <button id="descargarBoton" type="submit" class="buscar-report-btn button">
               Descargar eventos
-            </button> -->
+            </button>
           </form>
         </div>
     </div>

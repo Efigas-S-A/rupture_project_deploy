@@ -41,7 +41,7 @@
   <body style="background-image: url('{{ url_for('static', filename='images/Fondo.png') }}')";>
     <div class="resultados-header">
       <div class="resultados-app-container">
-        <form method="GET" action="https://proyectorupturasmd.efigas.com.co//Inicio">
+        <form method="GET" action="http://127.0.0.1:5000//Inicio">
           <button type="submit" class="resultados-button button">
             <i class="fa fa-right-from-bracket"></i>
           </button>
@@ -50,7 +50,7 @@
           alt="Logo FuGas"
           src="{{ url_for('static', filename='images/logos/RL_logo.png') }}"
           class="resultados-app-logo"
-          onclick="window.location.href ='https://proyectorupturasmd.efigas.com.co//Perfil';"
+          onclick="window.location.href ='http://127.0.0.1:5000//Perfil';"
         />
       </div>
     </div>
@@ -117,17 +117,17 @@
         <label id="aprobado" name="aprobado" class="reporte-label"></label>
       </div>
       <div class="resultados-container7">             
-        <form method="POST" action="https://proyectorupturasmd.efigas.com.co//CargarBuscar" class="reporte-forma">
+        <form method="POST" action="http://127.0.0.1:5000//CargarBuscar" class="reporte-forma">
           <button type="submit" class="resultados-evento-btn button">
             Volver
           </button>
         </form>
-        <form method="POST" id="aprobarForm" action="https://proyectorupturasmd.efigas.com.co//Aprobar" class="reporte-forma">
+        <form method="POST" id="aprobarForm" action="http://127.0.0.1:5000//Aprobar" class="reporte-forma">
           <button id="aprobarBoton" name="aprobarBoton" type="submit" class="resultados-evento-btn button">
             Aprobar
           </button>
         </form>
-        <form method="POST" id="editarForm" action="https://proyectorupturasmd.efigas.com.co//Editar" class="reporte-forma">
+        <form method="POST" id="editarForm" action="http://127.0.0.1:5000//Editar" class="reporte-forma">
           <button id="editarBoton" name="editarBoton" type="submit" class="resultados-evento-btn button">
             Editar
           </button>

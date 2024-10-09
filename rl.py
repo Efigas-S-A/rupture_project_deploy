@@ -12,7 +12,7 @@ from pyDes import *
 import modelos
 import datetime
 import shutil
-
+from io import BytesIO
 
 dominio = "https://ds.efigas.com.co/" # CAMBIAR AL DOMINIO DE DESPLIEGUE
 app = Flask(__name__)
@@ -860,40 +860,32 @@ def aprobar():
 
 @app.route('/Descargar', methods=['POST'])
 def downloadFile ():
-    filtro = request.form.get('actFiltros')
-    tiempoInicio = request.form.get('fecha_ini')
-    tiempoFin = request.form.get('fecha_final')
-    archivo = "eventos/" + request.cookies.get("empresa") + ".xlsx"
-    if filtro != None:
-        try:
-            wb1 = load_workbook(archivo)
-            ws1 = wb1.active
+    
+    ### Llamamos al endpoint para traernos la lista de eventos 
+    # url = dominio+"rupture/getSpecificEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
+    url = dominio+"rupture/getEvents"
+    response = requests.get(url) 
+    # Crear un DataFrame de pandas a partir de la lista de objetos
+    df = pd.DataFrame(response.json())
+     # Crear un buffer en memoria para guardar el archivo Excel
+    buffer = BytesIO()
 
-            wb2 = Workbook()
-            ws2 = wb2.active
+    # Guardar el DataFrame en el buffer como archivo Excel
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Datos')
 
-            inicio = datetime.datetime.strptime("2000-01-01", '%Y-%m-%d') if tiempoInicio == '' else datetime.datetime.strptime(tiempoInicio, '%Y-%m-%d')
-            fin = datetime.datetime.today() if tiempoFin == '' else datetime.datetime.strptime(tiempoFin, '%Y-%m-%d')
+    # Regresar el cursor del buffer al inicio para que Flask pueda leerlo
+    buffer.seek(0)
 
-            header_row = list(ws1.iter_rows(min_row=1, max_row=1, values_only=True))[0]
-            ws2.append(header_row)
-            for row in ws1.iter_rows(min_row=2, max_row=ws1.max_row, values_only=True):
-                print(inicio, row[20], fin)
-                if inicio <= row[20] <= fin:
-                    ws2.append(row)
-                    
-            archivo_temp = request.cookies.get("empresa") + str(inicio.day) + str(inicio.month) + str(inicio.year) + '_' + str(fin.day) + str(fin.month) + str(fin.year) + ".xlsx"
-            wb2.save("temp/" + archivo_temp)
-            wb1.close()
-            wb2.close()
-
-            #Como esto es windows no es posible usar after_this_request para borrar el archivo antes de enviar
-            return make_response(redirect("/Descargar/" + archivo_temp, code=307))
-        except FileNotFoundError:
-            return "Archivo de origen no se encuentra", 404
-    else:
-        response = send_file(archivo, as_attachment=True)
-    return send_file(archivo, as_attachment=True)
+    # Enviar el archivo como una respuesta de descarga
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name='datos.xlsx',
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    # response = send_file(archivo, as_attachment=True)
+    # return send_file(archivo, as_attachment=True)
 
 #Carga el archivo en cache para poder borrarlo sin tener problemas al enviar
 @app.route('/Descargar/<path:filename>', methods=['POST'])

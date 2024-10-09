@@ -73,7 +73,7 @@
   <body style="background-image: url('{{ url_for('static', filename='images/Fondo.png') }}')";>
     <div class="principal-header">
         <div class="principal-app-container">
-          <form method="GET" action="https://proyectorupturasmd.efigas.com.co//Inicio">
+          <form method="GET" action="http://127.0.0.1:5000//Inicio">
             <button type="submit" class="principal-button button">
               <i class="fa fa-right-from-bracket"></i>
             </button>
@@ -82,7 +82,7 @@
             alt="Logo FuGas"
             src="{{ url_for('static', filename='images/logos/RL_logo.png') }}"
             class="principal-app-logo"
-            onclick="window.location.href ='https://proyectorupturasmd.efigas.com.co//Perfil';"
+            onclick="window.location.href ='http://127.0.0.1:5000//Perfil';"
           />
         </div>
     </div>
@@ -92,17 +92,17 @@
           <h1 id="banner" name="banner" class="principal-text">Bienvenido&nbsp;</h1>
         </div>
         <div class="principal-container4">
-          <form method="POST" class="principal-form" action="https://proyectorupturasmd.efigas.com.co//NuevoEvento">
+          <form method="POST" class="principal-form" action="http://127.0.0.1:5000//NuevoEvento">
             <button type="submit" class="principal-evento-btn button">
               Nuevo evento
             </button>
           </form>
-          <form method="POST" class="principal-form" action="https://proyectorupturasmd.efigas.com.co//CargarBuscar">
+          <form method="POST" class="principal-form" action="http://127.0.0.1:5000//CargarBuscar">
             <button type="submit" class="principal-report-btn button">
               Visualizar evento
             </button>
           </form>
-          <form method="POST" id="crearAdmin" class="principal-form" action="https://proyectorupturasmd.efigas.com.co//RegistrarseAdmin">
+          <form method="POST" id="crearAdmin" class="principal-form" action="http://127.0.0.1:5000//RegistrarseAdmin">
             <button type="submit" class="principal-report-btn button">
               Crear admin
             </button>
