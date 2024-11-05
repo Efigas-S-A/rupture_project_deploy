@@ -45,6 +45,10 @@ activa el entorno virtual
       python rl.py
    ```
 
+Notas adicionales
+Asegúrate de tener el proyecto de mongorupture ejecutando en paralelo a este proyecto para que funcione el repositorio de interes de la base de datos de mongo esta en :
+
+https://github.com/Efigas-S-A/mongorupture
 
 
 
