@@ -20,13 +20,7 @@ app.secret_key = b'f83ea3ca1a60a8ae08ae73681c5565870666a30bce8dfdb6a4fe65b9508fd
 key = b"\xaf\xf5q'Pg\xf7\xeeC\x9e\xde\xf4FM,\xe6`\xe7\xd8\x01\xa0T\xaam" ## LLAVE PARA ENVOLVER LA APLICACIÓN TIENE QUE SER EN EL FORMATO HEXADECIMAL Y LUEGO SE PASA A CADENA DE BYTES QUE TERMINA SIENDO DEL FORMATO b'' ESTA SERA LA LLAVE PARA CODIFICAR LAS CONTRASEÑAS
 
 # Flask-Mail configuration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # el servidor SMTP de preferencia asociado al servidor del correo es decir si es gmail o outlook etc 
-app.config['MAIL_PORT'] = 587  # el puerto del servidor SMTP que se requiere y por el cual se envian los correos
-app.config['MAIL_USERNAME'] = 'lz7910412@gmail.com'  # VARIABLE DE ENTORNO QUE REPRESENTA EL EMAIL POR DONDE SE VAN A ENVIAR LOS CORREOS ASOCIADOS
-app.config['MAIL_PASSWORD'] = 'zexw bofv jgbc jdyf'  # VARIABLE DE ENTORNO QUE CONTIENE LA CONTRASEÑA DE APLICACIÓN NO DEL EMAIL, SINO LA CONTRASEÑA DE APLICACIÓN QUE SE CREA EN EL PORTAL DE GMAIL O MICROSOFT Y QUE PERMITE ENVIAR CORREOS DESDE EL EMAIL SUMINISTRADO
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_DEFAULT_SENDER'] = 'lz7910412@gmail.com' # Correo desde el cual se envian mensajes si el mensaje no especifica se puede dejar el mismo MAIL_USERNAME
-ail = Mail(app)
+
 
 #Redirige a la pagina de inicio si se carga una página interna sin una sesión iniciada
 # def login_required(f):
