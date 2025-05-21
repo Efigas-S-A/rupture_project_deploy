@@ -11,6 +11,7 @@ import pandas as pd
 from pyDes import *
 import modelos
 import datetime
+import numpy as np
 import shutil
 from io import BytesIO
 
@@ -409,7 +410,7 @@ def nuevoEvento():
     Tlargo = float(Tlargo) if Tlargo != "" else 0
     Tlargo2 = float(Tlargo2) if Tlargo2 != "" else 0
     longitud = float(longitud) if longitud != "" else 0
-    Alto = float(Alto) if Alto != "" else 0
+    #Alto = float(Alto) if Alto != "" else 0
     Tdiametro = float(Tdiametro)
     
     #Aplicar los diametros equivalentes
@@ -424,7 +425,7 @@ def nuevoEvento():
     Tlargo = convertir(TlargoUni, "m", Tlargo)
     Tlargo2 = convertir(TlargoUni2, "m", Tlargo2)
     longitud = convertir(longitudUni, "mm", longitud)
-    Alto = convertir(AltoUni, "mm", Alto)
+    #Alto = convertir(AltoUni, "mm", Alto)
 
     TubeLargo = Tlargo + Tlargo2
 
@@ -459,11 +460,11 @@ def nuevoEvento():
             area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0,0)
             perimetro = modelos.calc_peri("circ", Fuga_diame, 0, 0, 0)
         else:
-            area = modelos.calc_area("recta", 0, 0, 0, longitud, Alto)
+            area = modelos.calc_area("recta", 0, 0, 0, longitud)
             perimetro = modelos.calc_peri("recta", 0, 0, 0, longitud)
             Fuga_diame = modelos.diametro_hidraulico(area, perimetro,diametro_int)
     else:
-        area = modelos.calc_area(forma, Fuga_diame, 0, 0, longitud,Alto)
+        area = modelos.calc_area(forma, Fuga_diame, 0, 0, longitud)
         perimetro = modelos.calc_peri(forma, Fuga_diame, 0, 0, longitud)
 
     #Valores necesarios para el modelo utp
@@ -481,24 +482,87 @@ def nuevoEvento():
         forma = "Recta"
         medida = longitud
         medidaUni = longitudUni
-        medida2=Alto
-        medidaUni2 = AltoUni
+        #medida2=Alto
+        #medidaUni2 = AltoUni
     elif forma == "total":
         forma = "Total"
         medida = ""
         medidaUni = ""
-        medida2= ""
-        medidaUni2 = ""
+        #medida2= ""
+        #medidaUni2 = ""
     else:
         forma = "Circular"
         medida = Fdiametro
         medidaUni = FdiametroUni
-        medida2= ""
-        medidaUni2 = ""
+        #medida2= ""
+        #medidaUni2 = ""
+
     
 
+    
+
+    ####
+    # NUEVO METODO DE CALCULO DEL FLUJO
+    ####
+    R_vals = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
+    R_real = 1.0 if forma == "Total" else Fuga_diame / diametro_int
+    Q_vals = []
+    if diametro_int > 76.2:
+        d1 = 50.8
+        d2 = 76.2
+        Q1_vals = []
+        Q2_vals = []
+        for R in R_vals:
+            R_actual = 1.0 if forma == "Total" else R
+            Q1_iter = []
+            Q2_iter = []
+
+            for d_tube_i, Q_iter in zip([d1, d2], [Q1_iter, Q2_iter]):
+                L0 = modelos.obtener_L0(R_actual, material)
+                if TubeLargo <= L0:
+                    Q0 = modelos.modelo_utpSuper(Fuga_diame, d_tube_i, presionTub, presionAtmos, subte, direccion, forma,TubeLargo,material,R_actual)
+                    Q_iter.append(Q0)
+                else:
+                    Q0 = modelos.modelo_utpSuper(Fuga_diame, d_tube_i, presionTub, presionAtmos, subte, direccion, forma,L0,material,R_actual)
+                    Q_iter.append(Q0)
+                    for L in range(L0 + 1, int(TubeLargo) + 1):
+                        a = modelos.alpha(L, R_actual, material)
+                        Qi = Q_iter[-1] if a is None else Q_iter[-1] * (1 - a)
+                        Q_iter.append(Qi)
+
+            Q1_vals.append(Q1_iter[-1])
+            Q2_vals.append(Q2_iter[-1])
+
+        Q1_interp = np.interp(R_real, R_vals, Q1_vals)
+        Q2_interp = np.interp(R_real, R_vals, Q2_vals)
+        Q_extrap = Q1_interp + (Q2_interp - Q1_interp) * ((diametro_int - d1) / (d2 - d1))
+
+        flujo=Q_extrap
+    else:
+        for R in R_vals:
+            R_actual = 1.0 if forma == "Total" else R
+            Q_iter = []
+            L0 = modelos.obtener_L0(R_actual, material)
+
+            if TubeLargo <= L0:
+                Q0 = modelos.modelo_utpSuper(Fuga_diame, diametro_int, presionTub, presionAtmos, subte, direccion, forma,TubeLargo,material,R_actual)
+                Q_iter.append(Q0)
+            else:
+                Q0 = modelos.modelo_utpSuper(Fuga_diame, diametro_int, presionTub, presionAtmos, subte, direccion, forma,L0,material,R_actual)
+                Q_iter.append(Q0)
+                print(L0,TubeLargo)
+                for L in range(L0 + 1, int(TubeLargo) + 1):
+                    a = modelos.alpha(L, R_actual, material)
+                    Qi = Q_iter[-1] if a is None else Q_iter[-1] * (1 - a)
+                    Q_iter.append(Qi)
+
+            Q_vals.append(Q_iter[-1])
+
+        Q_final = np.interp(R_real, R_vals, Q_vals)
+        flujo=Q_final
     #Se calcula el flujo y volumen total perdido
-    flujo = coef_flujo * modelos.modelo_utpSuper(Fuga_diame, diametro_int, presionTub, presionAtmos, subte, direccion, forma)
+
+    #flujo = coef_flujo * modelos.modelo_utpSuper(Fuga_diame, diametro_int, presionTub, presionAtmos, subte, direccion, forma)
     vol_muerto = modelos.vol_muerto(diametro_int, TubeLargo)
     Volumenfugado=(flujo * duracion2)
     volumen = Volumenfugado + vol_muerto
@@ -538,7 +602,7 @@ def nuevoEvento():
     vol_muerto2 = float(vol_muerto2)
     resp = make_response(render_template('resultados.html',Unidades=Unidades,material=material,Tdiametro=round(Tdiametro,2), Volumenfugado=round(Volumenfugado,2),vol_muerto=round(vol_muerto2,2),Subte=subte,Tlargo=TubeLargo,TlargoUni=TlargoUni, orden=orden, area=round(area,2), flujo=round(flujo,2), volumen=round(volumen,2), horas=horas, minutos=minutos, longitud=round(longi,4), latitud=lati, año_reg = hoy.year, mes_reg = hoy.month, dia_reg = hoy.day, año_inicio=tiempoInicio.year, mes_inicio=tiempoInicio.month, dia_inicio=tiempoInicio.day, direccion = "Unidireccional" if direccion == "uni" else "Bidireccional", presion_tube = round(convertir("bar", "psig", presionTub),2), presion_atmos=round(convertir("bar", "psig",presionAtmos),2), forma=forma))
     if request.cookies.get('guardado') == "false":
-        result = guardar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2,medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, hoy, presionAtmos, escape if equi == "on" else 'no')
+        result = guardar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, hoy, presionAtmos, escape if equi == "on" else 'no')
         if (result):
             resp.set_cookie('guardado', 'true')
             return resp
@@ -593,8 +657,7 @@ def reporte():
     objeto_ = {'orden':orden }
     
     url = dominio+"rupture/getSpecificEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
-    
-    print("DATOS QUERY: ",url,objeto_)
+
     response = requests.post(url,json=objeto_)
     if(response.json()['status'] == 'Si hay elemento'):
         fila = response.json()['info']
@@ -676,7 +739,6 @@ def editar():
     
     url = dominio+"rupture/getSpecificEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
     
-    print("DATOS QUERY: ",url,objeto_)
     response = requests.post(url,json=objeto_)
     if(response.json()['status'] == 'Si hay elemento'):
             fila = response.json()['info']
@@ -755,7 +817,7 @@ def editarEvento():
     Tlargo = convertir(TlargoUni, "m", Tlargo)
     Tlargo2 = convertir(TlargoUni2, "m", Tlargo2)
     longitud = convertir(longitudUni, "mm", longitud)
-    Alto = convertir(AltoUni, "mm", Alto)
+    #Alto = convertir(AltoUni, "mm", Alto)
 
     TubeLargo = Tlargo + Tlargo2
 
@@ -790,11 +852,11 @@ def editarEvento():
             area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0,0)
             perimetro = modelos.calc_peri("circ", Fuga_diame, 0, 0, 0)
         else:
-            area = modelos.calc_area("recta", 0, 0, 0, longitud,Alto)
+            area = modelos.calc_area("recta", 0, 0, 0, longitud)
             perimetro = modelos.calc_peri("recta", 0, 0, 0, longitud)
             Fuga_diame = modelos.diametro_hidraulico(area, perimetro,diametro_int)
     else:
-        area = modelos.calc_area(forma, Fuga_diame, 0, 0, longitud, Alto)
+        area = modelos.calc_area(forma, Fuga_diame, 0, 0, longitud)
         perimetro = modelos.calc_peri(forma, Fuga_diame, 0, 0, longitud)
 
     #Valores necesarios para el modelo utp
@@ -812,20 +874,20 @@ def editarEvento():
         forma = "Recta"
         medida = longitud
         medidaUni = longitudUni
-        medida2 = Alto
-        medidaUni2 = AltoUni
+        #medida2 = Alto
+        #medidaUni2 = AltoUni
     elif forma == "total":
         forma = "Total"
         medida = ""
         medidaUni = ""
-        medida2=""
-        medidaUni2=""
+        #medida2=""
+        #medidaUni2=""
     else:
         forma = "Circular"
         medida = Fdiametro
         medidaUni = FdiametroUni
-        medida2=""
-        medidaUni2=""
+        #medida2=""
+        #medidaUni2=""
     
     #diametro_int de mm a m
     # Fuga_diame /= 1000
@@ -839,7 +901,7 @@ def editarEvento():
     
     resp = make_response(redirect("/Reporte", code=307))
     if request.cookies.get('guardado') == "false":
-        response = editar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni, medida2, medidaUni2, area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, presionAtmos, escape if equi == "on" else 'no')
+        response = editar_evento(orden, ubicacion, convertir("bar", "psig", presionTub), subte, Tlargo, TlargoUni, Tlargo2, TlargoUni2, Tdiametro, material, Unidades, direccion, forma, medida, medidaUni,area, flujo, volumen, vol_muerto, Volumenfugado, tiempoInicio, duracion, presionAtmos, escape if equi == "on" else 'no')
         print("EDITADO? ",response)
         resp.set_cookie('guardado', 'true')
     return resp
@@ -970,25 +1032,22 @@ def convertir (origen, objetivo, valor):
             conv = (valor*9/5) + 32
     return conv
 
-def guardar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_uni, dist_tube2, dist_tube_uni2, diame_tube, material, Unidades, dire, forma, medida_fuga, medida_uni, medida_fuga2, medida_uni2, area, flujo, volumen, volumen_muerto, volumen_fuga, inicio, duracion, fecha, presion_atmos, diame_equi):
+def guardar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_uni, dist_tube2, dist_tube_uni2, diame_tube, material, Unidades, dire, forma, medida_fuga, medida_uni,area, flujo, volumen, volumen_muerto, volumen_fuga, inicio, duracion, fecha, presion_atmos, diame_equi):
     #EN CASO DE EDITAR LAS COLUMNAS QUE SE GUARDAN
     #Se debe editar también la función de creación de tabla y función de aprobación para que
     #el index concuerde con la columna de aprobado
     
-    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':float(flujo), 'volumen':float(volumen), 'inicio':inicio.strftime('%Y-%m-%d %H:%M'), 'duracion':duracion, 'hora_reg':fecha.strftime('%Y-%m-%d %H:%M'), 'presion_atmos':float(presion_atmos), 'volumen_fuga':float(volumen_fuga),'volumen_muerto':float(volumen_muerto), 'diame_equi':diame_equi, 'aprobado':'no' }
+    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'area':area, 'flujo':float(flujo), 'volumen':float(volumen), 'inicio':inicio.strftime('%Y-%m-%d %H:%M'), 'duracion':duracion, 'hora_reg':fecha.strftime('%Y-%m-%d %H:%M'), 'presion_atmos':float(presion_atmos), 'volumen_fuga':float(volumen_fuga),'volumen_muerto':float(volumen_muerto), 'diame_equi':diame_equi, 'aprobado':'no' }
     
     url = dominio+"rupture/createEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
-    
-    print("DATOS QUERY: ",url,objeto_)
     response = requests.post(url,json=objeto_)
-    print("RESPUESTA dawdawd: ",response.json())
     if(response.json()['status'] == 'Orden creada con éxito'):
         return True 
     else:
         return False
 
-def editar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_uni, dist_tube2, dist_tube_uni2, diame_tube, material, Unidades, dire, forma, medida_fuga, medida_uni,medida_fuga2, medida_uni2, area, flujo, volumen, volumen_muerto, volumen_fuga, inicio, duracion, presion_atmos, diame_equi):
-    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni,'medida_rupt2':medida_fuga2, 'medida_uni2':medida_uni2, 'area':area, 'flujo':float(flujo), 'volumen':float(volumen), 'inicio':inicio.strftime('%Y-%m-%d %H:%M'), 'duracion':duracion, 'presion_atmos':float(presion_atmos), 'volumen_fuga':float(volumen_fuga),'volumen_muerto':float(volumen_muerto), 'diame_equi':diame_equi, 'aprobado':'no' }
+def editar_evento(orden, ubicacion, presion_tube, subte, dist_tube, dist_tube_uni, dist_tube2, dist_tube_uni2, diame_tube, material, Unidades, dire, forma, medida_fuga, medida_uni, area, flujo, volumen, volumen_muerto, volumen_fuga, inicio, duracion, presion_atmos, diame_equi):
+    objeto_ = {'orden':orden, 'ubicacion':ubicacion,'presion':presion_tube, 'subte':subte, 'dist_tube':dist_tube, 'dist_tube_uni':dist_tube_uni, 'dist_tube2':dist_tube2, 'dist_tube_uni2':dist_tube_uni2,'diame_tube':diame_tube,'Material':material, 'Unidades':Unidades , 'direccion':dire, 'forma':forma, 'medida_rupt':medida_fuga, 'medida_uni':medida_uni, 'area':area, 'flujo':float(flujo), 'volumen':float(volumen), 'inicio':inicio.strftime('%Y-%m-%d %H:%M'), 'duracion':duracion, 'presion_atmos':float(presion_atmos), 'volumen_fuga':float(volumen_fuga),'volumen_muerto':float(volumen_muerto), 'diame_equi':diame_equi, 'aprobado':'no' }
     url = dominio+"rupture/updateEvent"#"https://mongorupture.efigasprojecthub.site/rupture/login"
     
     response = requests.post(url,json=objeto_)
@@ -1040,7 +1099,7 @@ def float_a_int(valor):
 def crear_tabla(empresa):
     wb = Workbook()
     ws = wb.active
-    headers = ['orden', 'ubicacion', 'presion', 'subte', 'dist_tube', 'dist_tube_uni', 'dist_tube2', 'dist_tube_uni2', 'diame_tube', 'Material', 'Unidades', 'direccion', 'forma', 'medida_rupt', 'medida_uni','medida_rupt2', 'medida_uni2', 'area', 'flujo', 'volumen', 'inicio', 'duracion', 'presion_atmos', 'volumen_fuga', 'volumen_muerto', 'diame_equi', 'aprobado', 'hora_reg']
+    headers = ['orden', 'ubicacion', 'presion', 'subte', 'dist_tube', 'dist_tube_uni', 'dist_tube2', 'dist_tube_uni2', 'diame_tube', 'Material', 'Unidades', 'direccion', 'forma', 'medida_rupt', 'medida_uni','area', 'flujo', 'volumen', 'inicio', 'duracion', 'presion_atmos', 'volumen_fuga', 'volumen_muerto', 'diame_equi', 'aprobado', 'hora_reg']
     for col_num, header in enumerate(headers, 1):
         ws.cell(row=1, column=col_num, value=header)
     wb.save("eventos/" + empresa + ".xlsx")

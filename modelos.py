@@ -1,23 +1,136 @@
 import numpy
+R_vals = numpy.array([0.0, 0.25, 0.5, 0.75, 1.0])
 
-def modelo_utpSuper(d_fuga, d_tube, p_tube, p_atmos, subte, direccion, forma):
-    """
-        Diametro tuberia: milimetros
-        Presion tuberia: bar
-        Presion atmosferica: bar
-    """
-    flujo = 0
+# Diccionario de coeficientes A para cada material y R conocido
+coef_A = {
+    "Acero": {
+        1.0: lambda d, L: (8e-5 * d**2 - 0.0126 * d + 0.938) * L**(-0.0006 * d + 0.5011),
+        0.75: lambda d, L: (8e-5 * d**2 - 0.0087 * d + 0.9977) * L**(-0.0016 * d + 0.4976),
+        0.5: lambda d, L: (-2e-10*d**2 + 7e-8*d - 5e-6)*L**2 + (4e-6*d**2 - 6e-4*d + 0.0288)*L + (0.0002*d**2 - 0.024*d + 7.4625),
+        0.25: lambda d, L: (1e-6*d**2 - 0.0002*d + 0.0104)*L + (6e-5*d**2 - 0.0085*d + 26.344),
+        0.0: lambda d, L: 0
+    },
+    "Polietileno": {
+        1.0: lambda d, L: (1e-6*d**2 - 0.0019*d + 0.5947) * L**(-5e-6*d**2 + 4e-5*d + 0.4769),
+        0.75: lambda d, L: (3e-5*d**2 - 0.0023*d + 0.8083) * L**(-1e-5*d**2 + 3e-6*d + 0.4343),
+        0.5: lambda d, L: (-2e-12*d**2 + 2e-8*d - 2e-6)*L**2 + (-1e-7*d**2 - 8e-5*d + 0.0131)*L + (7e-6*d**2 - 0.0035*d + 6.8071),
+        0.25: lambda d, L: (-4e-10*d**2 + 4e-8*d - 8e-7)*L**2 + (3e-8*d**2 - 4e-5*d + 0.0047)*L + (1e-6*d**2 - 0.0002*d + 26.041),
+        0.0: lambda d, L: 0
+    }
+}
+
+
+# Cálculo de coeficiente A dado un R puntual
+def calcular_A(d_tube, longitud, R, material):
+    if longitud <= 50:
+        if material == "Acero":
+            if R == 1.0:
+                A = (-1.42655e-7 * d_tube**2 + 2.15052e-5 * d_tube - 0.000932527) * longitud**2 + \
+                    (1.83867e-5 * d_tube**2 - 0.00286611 * d_tube + 0.14095) * longitud + \
+                    (2.24415e-5 * d_tube**2 - 0.00319416 * d_tube + 1.74606)
+                return A
+            elif R == 0.75:
+                A = (-9e-8 * d_tube**2 + 1e-5 * d_tube - 0.0005) * longitud**2 + \
+                    (1.4522e-5 * d_tube**2 - 0.002207 * d_tube + 0.101461) * longitud + \
+                    (6.3602e-6 * d_tube**2 - 0.000863 * d_tube + 2.92214)
+                return A
+        elif material == "Polietileno":
+            if R == 1.0:
+                A = (0.00000285152 * d_tube - 0.000335116) * longitud**2 + \
+                    (-0.000440495 * d_tube + 0.0622487) * longitud + \
+                    (-0.000314108 * d_tube + 1.6562)
+                return A
+            elif R == 0.75:
+                A = (0.000001 * d_tube - 0.0001) * longitud**2 + \
+                    (0.000309778 * d_tube + 0.0405944) * longitud + \
+                    (-0.0000549869 * d_tube + 2.89734)
+                return A
+
+    return coef_A[material][R](d_tube, longitud)
+
+# Interpolación de alpha según material y L para un R puntual
+def alpha(L, R, material):
+    if material == "Acero":
+        if R == 1.0 and L > 1600:
+            return 0.518123 * L**(-0.999574)
+        elif R == 0.75 and L > 1400:
+            return 0.522976 * L**(-0.999541)
+        elif R == 0.5 and L > 900:
+            return 0.517503 * L**(-0.999412)
+        elif R == 0.25 and L > 1400:
+            return 0.229286 * L**(-0.999637)
+    elif material == "Polietileno":
+        if R in [1.0, 0.75] and L > 1400:
+            return 0.517845 * L**(-0.999502)
+        elif R == 0.5 and L > 1200:
+            return 0.517845 * L**(-0.999502)
+        elif R == 0.25 and L > 1400:
+            return 0.159491 * L**(-0.999617)
+    return None
+
+#Factor multiplicativo por rotura total
+def factor_rotura_total(longitud, material):
+    if material == "Acero":
+        if longitud <= 10:
+            return 4.006269643
+        elif longitud <= 90:
+            return 1.288833046
+        elif longitud <= 600:
+            return 1.044385934
+        else:
+            return 1.007683532
+    elif material == "Polietileno":
+        if longitud <= 10:
+            return 4.05805243
+        elif longitud <= 90:
+            return 1.296293257
+        elif longitud <= 600:
+            return 1.045834945
+        else:
+            return 1.007896708
+    return 1
+
+
+# Función principal para calcular el caudal
+def modelo_utpSuper(d_fuga, d_tube, p_tube, p_atmos, subte, direccion, forma, longitud, material, R):
+    A = calcular_A(d_tube, longitud, R, material)
+    print (A)
+    if A == 0:
+        return 0
 
     if subte == "subterranea":
-        flujo = 0.55 *0.168* (1 + numpy.power((d_fuga/d_tube),4)) * numpy.power(d_fuga,2) * (p_tube + p_atmos)
+        flujo = 0.55 * 0.168 * (1 + numpy.power((d_tube / d_tube), 4)) * d_tube**2 * (p_tube + p_atmos) / A
     else:
-        flujo = 0.55 * (1 + 0.34*numpy.power((d_fuga/d_tube),4)) * numpy.power(d_fuga,2) * (p_tube + p_atmos)
-        print(d_fuga)
-        print(d_tube)
-    if forma=="Total" and direccion == "bi":
-        flujo = flujo*2
+        flujo = 0.55 * (1 + 0.34 * numpy.power((d_tube / d_tube), 4)) * d_tube**2 * (p_tube + p_atmos) / A
+    print (flujo)
+    if forma == "Total":
+        flujo *= factor_rotura_total(longitud, material)
 
+        if direccion == "bi":
+            flujo *= 2
+    print (flujo)
     return flujo
+
+
+# L0 según material y R
+def obtener_L0(R, material):
+    if material == "Acero":
+        if R >= 1.0:
+            return 1600
+        elif R >= 0.75:
+            return 1400
+        elif R >= 0.5:
+            return 900
+        else:
+            return 1400
+    elif material == "Polietileno":
+        if R >= 0.75:
+            return 1400
+        elif R >= 0.5:
+            return 1200
+        else:
+            return 1400
+    return longitud
 
 def modelo():
     #TODO
@@ -43,9 +156,8 @@ def rho_interior(p, R_gas, temp):
     rho_int = p/R_gas*temp
     return rho_int
 
-def calc_area(forma, diametro, alto, largo, longitud,Alto):
+def calc_area(forma, diametro, alto, largo, longitud):
     area = 0
-    print(Alto)
     if forma == "circ":
         area = numpy.pi * numpy.square(diametro/2)
     elif forma == "rect":
@@ -53,13 +165,9 @@ def calc_area(forma, diametro, alto, largo, longitud,Alto):
     elif forma == "tria":
         area = alto * largo / 2
     elif forma == "recta":
-        if Alto==0:
-             a = 1.5
-             area = longitud * a
-        else:
-            a = Alto
-            area = longitud * a
         #Valor preestablecido de alto en mm
+        a = 1.5
+        area = longitud * a
     else:
         area = numpy.pi * alto * largo
 
@@ -570,58 +678,54 @@ def diametro_interno2(diametro):
 def diametro_equi(diametro, escape):
     equi = 0
     if escape == "min":
-        if (diametro >= 0.75 and diametro <1) or (diametro >= 20 and diametro < 25):
+        if diametro == 0.75:
             equi = 0.225
-        elif (diametro >= 0.5 and diametro < 0.75):
-            equi=0.2
-        elif (diametro >= 1 and diametro < 1.25) or (diametro >= 26 and diametro <33):
+        elif diametro == 1 or diametro == 26:
             equi = 0.3
-        elif (diametro >= 1.25 and diametro < 1.5) or (diametro >= 33 and diametro <42):
+        elif diametro == 1.25 or diametro == 33:
             equi = 0.375
-        elif (diametro >= 1.5 and diametro <2) or (diametro >= 42 and diametro<48):
+        elif diametro == 1.5 or diametro == 42:
             equi = 0.45
-        elif (diametro >= 2 and diametro<2.25) or (diametro >= 48 and diametro<60):
+        elif diametro == 2 or diametro == 48:
             equi = 0.6
-        elif (diametro >= 2.25 and diametro<3) or (diametro >= 60 and diametro<73):
+        elif diametro == 2.25 or diametro == 60:
             equi = 0.675
-        elif (diametro >= 3 and diametro<3.5) or (diametro >= 73 and diametro<88):
+        elif diametro == 3 or diametro == 73:
             equi = 0.9
-        elif (diametro >= 3.5 and diametro <4) or (diametro>=88 and diametro<102): #3.5
+        elif diametro == 88: #3.5
             equi = 1.05
-        elif (diametro >= 4 and diametro<4.5) or (diametro>=102 and diametro<114):
+        elif diametro == 4:
             equi = 1.2
-        elif (diametro >= 4.5 and diametro<6) or (diametro>= 114 and diametro<152): #4.5
+        elif diametro == 114: #4.5
             equi = 1.35
-        elif (diametro >= 6 and diametro<6.5) or (diametro>=152 and diametro<168):
+        elif diametro == 6:
             equi = 1.8
-        elif (diametro >= 168) or (diametro>=6.5 and diametro<20): #6.5
+        elif diametro == 168: #6.5
             equi = 1.95
     elif escape == "parcial":
-        if (diametro >= 0.75 and diametro <1) or (diametro >= 20 and diametro < 25):
+        if diametro == 0.75:
             equi = 0.525
-        elif (diametro >= 0.5 and diametro < 0.75):
-            equi=0.325
-        elif (diametro >= 1 and diametro < 1.25) or (diametro >= 26 and diametro <33):
+        elif diametro == 1 or diametro == 26:
             equi = 0.7
-        elif (diametro >= 1.25 and diametro < 1.5) or (diametro >= 33 and diametro <42):
+        elif diametro == 1.25 or diametro == 33:
             equi = 0.875
-        elif (diametro >= 1.5 and diametro <2) or (diametro >= 42 and diametro<48):
+        elif diametro == 1.5 or diametro == 42:
             equi = 1.05
-        elif (diametro >= 2 and diametro<2.25) or (diametro >= 48 and diametro<60):
+        elif diametro == 2 or diametro == 48:
             equi = 1.4
-        elif (diametro >= 2.25 and diametro<3) or (diametro >= 60 and diametro<73):
+        elif diametro == 2.25 or diametro == 60:
             equi = 1.575
-        elif (diametro >= 3 and diametro<3.5) or (diametro >= 73 and diametro<88):
+        elif diametro == 3 or diametro == 73:
             equi = 2.1
-        elif (diametro >= 3.5 and diametro <4) or (diametro>=88 and diametro<102): #3.5
+        elif diametro == 88: #3.5
             equi = 2.45
-        elif (diametro >= 4 and diametro<4.5) or (diametro>=102 and diametro<114):
+        elif diametro == 4:
             equi = 2.8
-        elif (diametro >= 4.5 and diametro<6) or (diametro>= 114 and diametro<152): #4.5
+        elif diametro == 114: #4.5
             equi = 3.15
-        elif (diametro >= 6 and diametro<6.5) or (diametro>=152 and diametro<168):
+        elif diametro == 6:
             equi = 4.2
-        elif (diametro >= 168) or (diametro>=6.5 and diametro<20): #6.5
+        elif diametro == 168: #6.5
             equi = 4.55
     else:
         if diametro < 26:

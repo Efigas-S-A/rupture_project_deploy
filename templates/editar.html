@@ -366,12 +366,12 @@
                     <option value="mm" selected="">mm</option>
                     <option value="in">in</option>
                   </select>
-                  <label class="Evento-label3">Ancho:</label>
+                  <!-- <label class="Evento-label3">Ancho:</label>
                   <input type="number" id="Altofuga" name="Altofuga" min="0" max="2000000" class="evento-txt-diametro" step="0" title="AAAA"/>
                   <select id="AltofugaUni" name="AltofugaUni" class="evento-presion-uni">
                     <option value="mm" selected="">mm</option>
                     <option value="in">in</option>
-                  </select>
+                  </select> -->
                 </div>
                 <div id="div_escape" class="evento-container20" style="display: none;">
                   <label class="Evento-label3">Escape:</label>
@@ -598,13 +598,7 @@
           else {
             document.getElementById("LongiFugaUni").selectedIndex = 0;
           }
-          document.getElementById("Altofuga").value = "{{ medida_rupt2 }}"
-          if ("{{ medida_uni2}}" == "in"){
-            document.getElementById("AltofugaUni").selectedIndex = 1;
-          }
-          else {
-            document.getElementById("AltofugaaUni").selectedIndex = 0;
-          }
+          
         }
       }
       else {

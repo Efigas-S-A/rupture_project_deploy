@@ -366,12 +366,12 @@
                   <option value="mm" selected="">mm</option>
                   <option value="in">in</option>
                 </select>
-                <label class="Evento-label3">Ancho:</label>
+                <!-- <label class="Evento-label3">Ancho:</label>
                 <input type="number" id="Altofuga" name="Altofuga" min="0" max="2000000" class="evento-txt-diametro" step="0" title="AAAA"/>
                 <select id="AltofugaUni" name="AltofugaUni" class="evento-presion-uni">
                   <option value="mm" selected="">mm</option>
                   <option value="in">in</option>
-                </select>
+                </select> -->
               </div>
               <div id="div_escape" class="evento-container20" style="display: none;">
                 <label class="Evento-label3">Escape:</label>
@@ -568,22 +568,22 @@
     fechas_max()
     habilitar_fin()
     habilitar_diametro()
-    var inputElement = document.getElementById('Altofuga');
+    // var inputElement = document.getElementById('Altofuga');
 
-    // Agrega un evento de mouseover al campo de entrada
-    inputElement.addEventListener('mouseover', function() {
-      // Muestra el mensaje en el título (tooltip)
-      inputElement.title = "Si desconoce este valor, dejar el campo en blanco";
-    });
+    // // Agrega un evento de mouseover al campo de entrada
+    // inputElement.addEventListener('mouseover', function() {
+    //   // Muestra el mensaje en el título (tooltip)
+    //   inputElement.title = "Si desconoce este valor, dejar el campo en blanco";
+    // });
 
-    inputElement.addEventListener('focus', function() {
-      // Muestra el mensaje en el título (tooltip)
-      inputElement.title = "Si desconoce este valor, dejar el campo en blanco";
-    });
-    inputElement.addEventListener('blur', function() {
-      // Restaura el título a su valor original cuando el campo pierde el foco
-      inputElement.title = "Si desconoce este valor, dejar el campo en blanco";
-    });
+    // inputElement.addEventListener('focus', function() {
+    //   // Muestra el mensaje en el título (tooltip)
+    //   inputElement.title = "Si desconoce este valor, dejar el campo en blanco";
+    // });
+    // inputElement.addEventListener('blur', function() {
+    //   // Restaura el título a su valor original cuando el campo pierde el foco
+    //   inputElement.title = "Si desconoce este valor, dejar el campo en blanco";
+    // });
   </script>
   </script>
 </html>
