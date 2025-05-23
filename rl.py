@@ -452,12 +452,12 @@ def nuevoEvento():
     #Si la ruptura es total se calculan los valores de una ruptura circular con el diametro de la tubería
     if forma == "total":
         Fuga_diame = diametro_int
-        area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0,0)
+        area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0)
         perimetro = modelos.calc_peri("circ", Fuga_diame, 0, 0, 0)
     #Si la ruptura es recta se calcula el diametro hidraulico
     elif forma == "recta":
         if equi == 'on':
-            area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0,0)
+            area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0)
             perimetro = modelos.calc_peri("circ", Fuga_diame, 0, 0, 0)
         else:
             area = modelos.calc_area("recta", 0, 0, 0, longitud)
@@ -844,12 +844,12 @@ def editarEvento():
     #Si la ruptura es total se calculan los valores de una ruptura circular con el diametro de la tubería
     if forma == "total":
         Fuga_diame = diametro_int
-        area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0,0)
+        area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0)
         perimetro = modelos.calc_peri("circ", Fuga_diame, 0, 0, 0)
     #Si la ruptura es recta se calcula el diametro hidraulico
     elif forma == "recta":
         if equi == 'on':
-            area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0,0)
+            area = modelos.calc_area("circ", Fuga_diame, 0, 0, 0)
             perimetro = modelos.calc_peri("circ", Fuga_diame, 0, 0, 0)
         else:
             area = modelos.calc_area("recta", 0, 0, 0, longitud)
